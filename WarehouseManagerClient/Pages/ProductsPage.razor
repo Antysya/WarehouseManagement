@@ -1,0 +1,50 @@
+﻿@page "/products"
+@using DataModel;
+@inject HttpApiClient.WarehouseApiClient WarehouseApiClient;
+<h3>Список товаров</h3>
+
+@if (_products != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Наименование товара</th>
+                <th>Артикул</th>
+                <th>Занимаемый объем</th>
+                <th>Товарная группа</th>
+                <th>Тип</th>
+                <th>Минимальный остаток</th>
+                <th>Максимальный срок хранения</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var product in _products)
+            {
+                <tr>
+                    <td>@product.Name</td>
+                    <td>@product.Code</td>
+                    <td>@product.BoxSize</td>
+                    <td>@product.ProductGroupId</td>
+                    <td>@product.ProductStatusId</td>
+                    <td>@product.MinimumStock</td>
+                    <td>@product.MaximumShelfLife</td>
+                </tr>
+            }
+        </tbody>
+</table>
+}
+else
+{
+    <h3>Загрузка товаров...</h3>
+}
+
+@code {
+    private IReadOnlyList<Products>? _products = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        _products = await WarehouseApiClient.GetProductsAsync();
+    }
+
+}
