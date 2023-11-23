@@ -1,0 +1,39 @@
+﻿@page "/references/product-type"
+@inject HttpApiClient.WarehouseApiClient WarehouseApiClient;
+
+<h1>Типы товаров</h1>
+
+@if (Types == null)
+{
+    <p><em>Загрузка...</em></p>
+}
+else
+{
+    <table class="table table-striped align-middle table-bordered">
+        <thead class="table-success">
+            <tr>
+                <th>Идентификатор</th>
+                <th>Наименование</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var Type in Types)
+            {
+                <tr>
+                    <td>@Type.Id</td>
+                    <td>@Type.Name</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@code {
+    protected IReadOnlyList<ProductStatuses> Types;
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        Types = await WarehouseApiClient.GetProductStatusesAsync();
+    }
+}
+
+

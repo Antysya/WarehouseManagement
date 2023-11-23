@@ -1,12 +1,13 @@
 ﻿@page "/products"
 @inject HttpApiClient.WarehouseApiClient WarehouseApiClient;
 
-<h1>Каталог товаров</h1>
+
+<h1 class="mb-3">Каталог товаров</h1>
+
 <div class="row">
     <div class="col-md-6">
-        <a href='/product/add' class="btn btn-primary" role="button">
-            Добавить товар
-        </a>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" href='/product/add'>Добавить товар</MudButton>
+
     </div>
     <div class="input-group col">
         <input type="text" class="form-control" placeholder="Поиск товара по наименованию"
@@ -21,15 +22,15 @@
         }
     </div>
 </div>
-<br />
+<br/>
 @if (products == null)
 {
-    <p><em>Загрузка товаров...</em></p>
+    <p class="text-danger"><em>Загрузка...</em></p>
 }
 else
 {
     <table class="table table-striped align-middle table-bordered">
-        <thead class="table-success">
+        <thead class="thead-success">
             <tr>
                 <th>Наименование товара</th>
                 <th>Артикул</th>
@@ -38,6 +39,7 @@ else
                 <th>Тип</th>
                 <th>Минимальный остаток</th>
                 <th>Максимальный срок хранения</th>
+                <th>Действия</th>
             </tr>
         </thead>
         <tbody>
@@ -52,7 +54,7 @@ else
                     <td>@product.MinimumStock</td>
                     <td>@product.MaximumShelfLife</td>
                     <td>
-                        <a href='/product/edit/@product.Id' class="btn btn-outline-dark" role="button">
+                        <a href='/product/edit/@product.Id' class="btn btn-outline-dark mr-2" role="button">
                             <i class="fas fa-edit"></i>
                         </a>
                         <a href='/product/delete/@product.Id' class="btn btn-outline-danger" role="button">
@@ -62,7 +64,6 @@ else
                 </tr>
             }
         </tbody>
-
     </table>
 }
 @code {

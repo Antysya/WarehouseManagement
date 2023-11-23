@@ -13,6 +13,7 @@ namespace Server
         public DbSet<Orders> Orders => Set<Orders>();
         public DbSet<OrderTypes> OrderTypes => Set<OrderTypes>();
         public DbSet<OrderStatuses> OrderStatuses => Set<OrderStatuses>();
+        public DbSet<ProductStatusInOrder> ProductStatusInOrder => Set<ProductStatusInOrder>();
         public DbSet<ProductsOnShelves> ProductsOnShelves => Set<ProductsOnShelves>();
         public AppDbContext(
             DbContextOptions<AppDbContext> options)

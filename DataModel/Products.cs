@@ -10,8 +10,8 @@ namespace DataModel
     public class Products
     {
         public int Id { get; init; }
-        public string Name { get; set; }
-        public string Code { get; set; }
+        public string Name { get; set; } = null!;
+        public string Code { get; set; } = null!;
         public int BoxSize { get; set; }
         public int ProductGroupId { get; set; }
         public int ProductStatusId { get; set; }

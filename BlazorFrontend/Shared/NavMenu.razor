@@ -1,0 +1,17 @@
+﻿<MudNavMenu>
+    <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Главная</MudNavLink>
+    <MudNavLink Href="/orders" Icon="@Icons.Material.Filled.ShoppingCart">Заказы</MudNavLink>
+    <MudNavLink Href="/placement" Icon="@Icons.Material.Filled.ProductionQuantityLimits">Размещение товаров</MudNavLink>
+    <MudNavLink Href="products" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Каталог товаров</MudNavLink>
+    <MudNavGroup Title="Справочники" Icon="@Icons.Material.Filled.Menu" Expanded="false">
+        <MudNavLink Href="/references/order-type" Icon="@Icons.Material.Filled.Bookmark">Типы заказов</MudNavLink>
+        <MudNavLink Href="/references/order-status" Icon="@Icons.Material.Filled.Bookmark">Статусы заказов</MudNavLink>
+        <MudNavLink Href="/references/product-group" Icon="@Icons.Material.Filled.Bookmark">Товарные группы</MudNavLink>
+        <MudNavLink Href="/references/product-type" Icon="@Icons.Material.Filled.Bookmark">Типы товаров</MudNavLink>
+        <MudNavLink Href="/references/product-status" Icon="@Icons.Material.Filled.Bookmark">Статусы товаров в заказе</MudNavLink>
+    </MudNavGroup>
+    <MudNavGroup Title="Отчеты" Icon="@Icons.Material.Filled.ShowChart" Expanded="false">
+        <MudNavLink Href="/report/remains" Icon="@Icons.Material.Filled.ShoppingCart">Остатки на складе</MudNavLink>
+        <MudNavLink Href="/report/order" Icon="@Icons.Material.Filled.BarChart">Заказ</MudNavLink>
+    </MudNavGroup>
+</MudNavMenu>
