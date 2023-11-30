@@ -25,5 +25,6 @@ namespace DataModel
         [ForeignKey("ProductStatusId")]
         public ProductStatuses ProductStatuses { get; set; }
 
+
     }
 }

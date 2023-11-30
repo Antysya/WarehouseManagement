@@ -29,6 +29,13 @@ namespace HttpApiClient
             return products!;
         }
 
+        public async Task<List<ProductsOnShelves>> GetPlacementAsync()
+        {
+            var uri = $"{_host}/api/placement";
+            var products = await _httpClient.GetFromJsonAsync<List<ProductsOnShelves>>(uri);
+            return products!;
+        }
+
         public async Task<IReadOnlyList<OrderTypes>> GetOrderTypesAsync()
         {
             var uri = $"{_host}/api/order-type";

@@ -1,0 +1,47 @@
+﻿@page "/placement"
+@inject HttpApiClient.WarehouseApiClient WarehouseApiClient;
+
+<h3>Размещение товаров</h3>
+
+<MudTable Items="@products" Hover="true" Bordered="true" Filter="new Func<ProductsOnShelves, bool>(FilterCycleCheck)">
+  <ToolBarContent>
+        <MudText Typo="Typo.h6" Style="margin-left: 50%">Поиск</MudText>
+        <MudTextField @bind-Value="@searchterm" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+</ToolBarContent>
+    <HeaderContent>
+        <MudTh>Идентификатор</MudTh>
+        <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<ProductsOnShelves, object>(x=>x.ProductId)">Товар</MudTableSortLabel></MudTh>
+        <MudTh>Ячейка</MudTh>
+        <MudTh>Количество</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Идентификатор">@context.Id</MudTd>
+        <MudTd DataLabel="ProductId">@context.Products</MudTd>
+        <MudTd DataLabel="ShelveId">@context.Shelving</MudTd>
+        <MudTd DataLabel="Quantity">@context.Quantity</MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="new int[]{10,20}"/>
+    </PagerContent>
+</MudTable>
+
+
+@code {
+    protected List<ProductsOnShelves> products = new();
+    string searchterm = "";
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        products = await WarehouseApiClient.GetPlacementAsync();
+    }
+    private bool FilterCycleCheck(ProductsOnShelves item)
+    {
+        if (item.ProductId.ToString().Contains(searchterm))
+        {
+            return true;
+        }
+        return false;
+    }
+
+}
+

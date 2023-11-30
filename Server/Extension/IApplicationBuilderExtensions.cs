@@ -39,6 +39,15 @@ namespace Server.Extension
             return app;
         }
 
+        public static IEndpointRouteBuilder MapPlacementEndpoints(this IEndpointRouteBuilder app)
+        {
+            app.MapGet("/api/placement", (AppDbContext dbContext) =>
+            {
+                return dbContext.ProductsOnShelves.ToListAsync();
+            });
+            return app;
+        }
+
         public static IEndpointRouteBuilder MapOrderTypesEndpoints(this IEndpointRouteBuilder app)
         {
             app.MapGet("/api/order-type", (AppDbContext dbContext) =>

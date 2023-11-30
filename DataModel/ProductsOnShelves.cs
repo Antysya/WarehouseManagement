@@ -18,5 +18,7 @@ namespace DataModel
         public Products Products { get; set; }
         [ForeignKey("ShelveId")]
         public Shelving Shelving { get; set; }
+
+
     }
 }

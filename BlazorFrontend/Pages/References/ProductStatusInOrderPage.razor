@@ -9,30 +9,45 @@
 }
 else
 {
-    <table class="table table-striped align-middle table-bordered">
-        <thead class="table-success">
-            <tr>
-                <th>Идентификатор</th>
-                <th>Наименование</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var Type in Types)
-            {
-                <tr>
-                    <td>@Type.Id</td>
-                    <td>@Type.Name</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <MudTable Items="@Types" Hover="true" Striped="true" SortLabel="Sort By" Filter="new Func<ProductStatusInOrder, bool>(FilterCycleCheck)">
+        <ToolBarContent>
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" href='/product-status/add'>Добавить</MudButton>
+            <MudTextField @bind-Value="@searchterm" Placeholder="Поиск по наименованию" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0" Style="margin-left:70%"></MudTextField>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<ProductStatusInOrder, object>(x=>x.Id)">Идентификатор</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<ProductStatusInOrder, object>(x=>x.Name)">Наименование</MudTableSortLabel></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Идентификатор">@context.Id</MudTd>
+            <MudTd DataLabel="Наименование">@context.Name</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager RowsPerPageString="Строк на странице:" PageSizeOptions="new int[]{10,20}" />
+        </PagerContent>
+    </MudTable>
+   
 }
 @code {
     protected IReadOnlyList<ProductStatusInOrder> Types;
+    string searchterm = "";
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
         Types = await WarehouseApiClient.GetProductStatusInOrderAsync();
+    }
+
+    private bool FilterCycleCheck(ProductStatusInOrder item)
+    {
+        if (item.Name.Contains(searchterm))
+        {
+            return true;
+        }
+        if (item.Id.ToString().Contains(searchterm))
+        {
+            return true;
+        }
+        return false;
     }
 }
 
