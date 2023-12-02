@@ -54,6 +54,11 @@ namespace Server.Extension
             {
                 return dbContext.OrderTypes.ToListAsync();
             });
+            app.MapPost("/api/order-type/add", async ([FromServices] AppDbContext dbContext, [FromBody] OrderTypes type) =>
+            {
+                await dbContext.OrderTypes.AddAsync(type);
+                await dbContext.SaveChangesAsync();
+            });
             app.MapGet("/api/order-statuses", (AppDbContext dbContext) =>
             {
                 return dbContext.OrderStatuses.ToListAsync();
