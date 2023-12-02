@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DataModel
 {
-    public class Products
+    public class Products : IEntity
     {
         public int Id { get; init; }
         public string Name { get; set; } = null!;

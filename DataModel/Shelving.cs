@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DataModel
 {
-    public class Shelving
+    public class Shelving : IEntity
     {
         public int Id { get; init; }
         public string Line { get; set; }
