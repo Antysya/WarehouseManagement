@@ -1,0 +1,25 @@
+﻿<MudDialog>
+    <DialogContent>
+        <MudTextField T="string" Label="Наименование" @bind-Value="_newName"></MudTextField>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Отменить</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Сохранить</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    private IReadOnlyList<OrderTypes> _types;
+    private int _newId;
+    private string _newName;
+    void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    void Cancel() => MudDialog.Cancel();
+
+    private async Task Add()
+    {
+        //await OrderTypes.AddAsync(_newName);
+        //_types = OrderTypes.GetOrderTypesAsync();
+    }
+}

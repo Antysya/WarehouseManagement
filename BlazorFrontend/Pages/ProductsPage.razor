@@ -1,184 +1,82 @@
 ﻿@page "/products"
 @inject HttpApiClient.WarehouseApiClient WarehouseApiClient;
 
-
 <h1 class="mb-3">Каталог товаров</h1>
-
-<div class="row">
-    <div class="col-md-6">
-        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" href='/product/add'>Добавить товар</MudButton>
-
-    </div>
-    <div class="input-group col">
-        <input type="text" class="form-control" placeholder="Поиск товара по наименованию"
-        @bind="SearchString" @bind:event="oninput" @onkeyup="FilterProducts" />
-        @if (SearchString.Length > 0)
-        {
-            <div class="input-group-append">
-                <button class="btn btn-danger" @onclick="ResetSearch">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-        }
-    </div>
-</div>
-<br/>
 @if (products == null)
 {
     <p class="text-danger"><em>Загрузка...</em></p>
 }
 else
 {
-    <table class="table table-striped align-middle table-bordered">
-        <thead class="thead-success">
-            <tr>
-                <th>Наименование товара</th>
-                <th>Артикул</th>
-                <th>Занимаемый объем</th>
-                <th>Товарная группа</th>
-                <th>Тип</th>
-                <th>Минимальный остаток</th>
-                <th>Максимальный срок хранения</th>
-                <th>Действия</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var product in products)
-            {
-                <tr>
-                    <td>@product.Name</td>
-                    <td>@product.Code</td>
-                    <td>@product.BoxSize</td>
-                    <td>@product.ProductGroupId</td>
-                    <td>@product.ProductStatusId</td>
-                    <td>@product.MinimumStock</td>
-                    <td>@product.MaximumShelfLife</td>
-                    <td>
-                        <a href='/product/edit/@product.Id' class="btn btn-outline-dark mr-2" role="button">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <a href='/product/delete/@product.Id' class="btn btn-outline-danger" role="button">
-                            <i class="fas fa-trash-alt"></i>
-                        </a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <MudTable Items="@products" Hover="true" Bordered="true" Filter="new Func<Products, bool>(FilterCycleCheck)">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6" Style="margin-left: 50%">Поиск</MudText>
+            <MudTextField @bind-Value="@searchterm" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Products, object>(x=>x.Id)">Идентификатор</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Products, object>(x=>x.Name)">Наименование товара</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Products, object>(x=>x.Code)">Артикул</MudTableSortLabel></MudTh>
+            <MudTh>Занимаемый объем</MudTh>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Products, object>(x=>x.ProductGroupId)">Товарная группа</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Products, object>(x=>x.ProductStatusId)">Тип</MudTableSortLabel></MudTh>
+            <MudTh>Минимальный остаток</MudTh>
+            <MudTh>Максимальный срок хранения</MudTh>
+            <MudTh>Действия</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Идентификатор">@context.Id</MudTd>
+            <MudTd DataLabel="Name">@context.Name</MudTd>
+            <MudTd DataLabel="Code">@context.Code</MudTd>
+            <MudTd DataLabel="BoxSize">@context.BoxSize</MudTd>
+            <MudTd DataLabel="ProductGroupId">@context.ProductGroupId</MudTd>
+            <MudTd>
+                <a href='/product/edit/@context.Id' class="btn btn-outline-dark mr-2" role="button">
+                    <i class="fas fa-edit"></i>
+                </a>
+                <a href='/product/delete/@context.Id' class="btn btn-outline-danger" role="button">
+                    <i class="fas fa-trash-alt"></i>
+                </a>
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{10,20}" />
+        </PagerContent>
+    </MudTable>
 }
+
 @code {
     protected List<Products> products = new();
-    protected List<Products> searchProductData = new();
-    protected Products product = new();
-    protected string SearchString { get; set; } = string.Empty;
+    string searchterm = "";
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
         products = await WarehouseApiClient.GetProductsAsync();
     }
-    protected void FilterProducts()
+
+    private bool FilterCycleCheck(Products item)
     {
-        if (!string.IsNullOrEmpty(SearchString))
+        if (item.Name.Contains(searchterm))
         {
-            products = searchProductData
-                .Where(x => x.Name.IndexOf(SearchString, StringComparison.InvariantCultureIgnoreCase) != -1)
-                .ToList();
+            return true;
         }
-        else
+        if (item.Id.ToString().Contains(searchterm))
         {
-            products = searchProductData;
+            return true;
         }
-    }
-    protected void DeleteConfirm(int productId)
-    {
-        product = products.FirstOrDefault(x => x.Id == productId);
-    }
-    public void ResetSearch()
-    {
-        SearchString = string.Empty;
-        products = searchProductData;
-    }
-}
-
-
-
-
-@*<h3>Список товаров</h3>
-@if (_products != null)
-{
-    <MudSimpleTable Hover="true" Dense="true" FixedHeader="true" Style="overflow-x: auto; height:600;">
-        <thead>
-            <tr>
-                <th>Наименование товара</th>
-                <th>Артикул</th>
-                <th>Занимаемый объем</th>
-                <th>Товарная группа</th>
-                <th>Тип</th>
-                <th>Минимальный остаток</th>
-                <th>Максимальный срок хранения</th>
-
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var product in _products)
-            {
-                <tr>
-                    <td>@product.Name</td>
-                    <td>@product.Code</td>
-                    <td>@product.BoxSize</td>
-                    <td>@product.ProductGroupId</td>
-                    <td>@product.ProductStatusId</td>
-                    <td>@product.MinimumStock</td>
-                    <td>@product.MaximumShelfLife</td>
-                    <td>
-                        <button @onclick="(() => EditProduct(product))" class="btn"><i class="fas fa-pencil-alt"></i></button>
-                        <MudIconButton Icon="Icons.Delete" Color="Color.Secondary" OnClick="() => DeleteItem(product)"></MudIconButton>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </MudSimpleTable>
-}
-else
-{
-    <h3>Загрузка товаров...</h3>
-}
-
-<style>
-    table {
-        border-collapse: collapse;
+        if (item.ProductStatusId.ToString().Contains(searchterm))
+        {
+            return true;
+        }
+        if (item.ProductGroupId.ToString().Contains(searchterm))
+        {
+            return true;
+        }
+        return false;
     }
 
-    tr {
-        border-bottom: 1px solid black;
-    }
-</style>
+        }
 
-@code {
-    private IReadOnlyList<Products>? _products = null;
 
-    protected override async Task OnInitializedAsync()
-    {
-        await base.OnInitializedAsync();
-        _products = await WarehouseApiClient.GetProductsAsync();
-    }
-    void EditProduct(Products product)
-    {
-        // Ваша логика редактирования товара
-    }
 
-    private void DeleteItem(Products products
-)
-    {
-        // Удаление элемента
-        // можно удалить объект item из Items
-
-        // Удаление из базы данных или другого источника
-        // ...
-
-        // Обновление отображения таблицы
-        StateHasChanged();
-    }
-}
-*@
 
