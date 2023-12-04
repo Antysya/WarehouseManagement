@@ -1,66 +1,92 @@
 ﻿@page "/products"
-@inject HttpApiClient.WarehouseApiClient WarehouseApiClient;
 
-<h1 class="mb-3">Каталог товаров</h1>
+<h3>Каталог товаров</h3>
 @if (products == null)
 {
-    <p class="text-danger"><em>Загрузка...</em></p>
+    <p><em>Загрузка...</em></p>
 }
 else
 {
-    <MudTable Items="@products" Hover="true" Bordered="true" Filter="new Func<Products, bool>(FilterCycleCheck)">
+    <MudTable Items="@products" Hover="true" Striped="true" Dense="true" FixedHeader="true"
+              CanCancelEdit="true" RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues"
+              RowEditCommit="ItemHasBeenCommitted" ReadOnly="false" @bind-SelectedItem="selectedItem1"
+              CommitEditTooltip="Commit Edit" OnCommitEditClick="@(() => Snackbar.Add("Вызван обработчик редактирования фиксации"))"
+              IsEditRowSwitchingBlocked="false"
+              ApplyButtonPosition="TableApplyButtonPosition.End" EditButtonPosition="TableEditButtonPosition.End"
+              EditTrigger="TableEditTrigger.RowClick"
+              SortLabel="Sort By" Filter="new Func<Products, bool>(FilterCycleCheck)">
         <ToolBarContent>
-            <MudText Typo="Typo.h6" Style="margin-left: 50%">Поиск</MudText>
-            <MudTextField @bind-Value="@searchterm" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            <MudButton @onclick="Add" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary">Добавить</MudButton>
+            <MudTextField @bind-Value="@searchterm" Placeholder="Поиск" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0" Style="margin-left:70%"></MudTextField>
         </ToolBarContent>
+        <ColGroup>
+            <col style="width:50px;" />
+            <col />
+            <col />
+            <col style="width:50px;" />
+            <col style="width:50px;"/>
+            <col style="width:50px;" />
+            <col />
+        </ColGroup>
+
         <HeaderContent>
             <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Products, object>(x=>x.Id)">Идентификатор</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Products, object>(x=>x.Name)">Наименование товара</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Products, object>(x=>x.Code)">Артикул</MudTableSortLabel></MudTh>
-            <MudTh>Занимаемый объем</MudTh>
-            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Products, object>(x=>x.ProductGroupId)">Товарная группа</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Products, object>(x=>x.ProductStatusId)">Тип</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Products, object>(x=>x.ProductGroup)">Товарная группа</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Products, object>(x=>x.ProductStatuses)">Тип</MudTableSortLabel></MudTh>
             <MudTh>Минимальный остаток</MudTh>
-            <MudTh>Максимальный срок хранения</MudTh>
-            <MudTh>Действия</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Идентификатор">@context.Id</MudTd>
-            <MudTd DataLabel="Name">@context.Name</MudTd>
-            <MudTd DataLabel="Code">@context.Code</MudTd>
-            <MudTd DataLabel="BoxSize">@context.BoxSize</MudTd>
-            <MudTd DataLabel="ProductGroupId">@context.ProductGroupId</MudTd>
-            <MudTd>
-                <a href='/product/edit/@context.Id' class="btn btn-outline-dark mr-2" role="button">
-                    <i class="fas fa-edit"></i>
-                </a>
-                <a href='/product/delete/@context.Id' class="btn btn-outline-danger" role="button">
-                    <i class="fas fa-trash-alt"></i>
-                </a>
-            </MudTd>
+            <MudTd DataLabel="Наименование">
+                <MudTextField @bind-Value="@context.Name" Required></MudTextField>
+                </MudTd>
+            <MudTd DataLabel="Code">
+                <MudTextField @bind-Value=@context.Code Required></MudTextField>
+                </MudTd>
+            <MudTd DataLabel="ProductGroup">@context.ProductGroup</MudTd>
+            <MudTd DataLabel="ProductStatus">@context.ProductStatuses</MudTd>
+            <MudTd DataLabel="MinimumStock">@context.MinimumStock></MudTd>
         </RowTemplate>
+        <RowEditingTemplate>
+            <MudTd DataLabel="Идентификатор">@context.Id</MudTd>
+            <MudTd DataLabel="Наименование">
+                <MudTextField @bind-Value="@context.Name" Required />
+            </MudTd>
+            <MudTd DataLabel="Code">
+                <MudTextField @bind-Value=@context.Code Required></MudTextField>
+            </MudTd>
+            <MudTd DataLabel="ProductGroup">@context.ProductGroup</MudTd>
+            <MudTd DataLabel="ProductStatus">@context.ProductStatuses</MudTd>
+            <MudTd DataLabel="MinimumStock">
+                <MudTextField @bind-Value=@context.MinimumStock Required></MudTextField>
+                </MudTd>
+        </RowEditingTemplate>
         <PagerContent>
-            <MudTablePager PageSizeOptions="new int[]{10,20}" />
+            <MudTablePager RowsPerPageString="Строк на странице:" PageSizeOptions="new int[]{10,20}" />
         </PagerContent>
     </MudTable>
 }
 
 @code {
-    protected List<Products> products = new();
+    protected IEnumerable<Products> products;
     string searchterm = "";
+    private Products elementBeforeEdit = new();
+    private Products selectedItem1;
+    private List<string> editEvents = new();
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        //products = await WarehouseApiClient.GetProductsAsync();
+        products = await WarehouseApiClient.GetProductsAsync();        
     }
-
     private bool FilterCycleCheck(Products item)
     {
         if (item.Name.Contains(searchterm))
         {
             return true;
         }
-        if (item.Id.ToString().Contains(searchterm))
+        if (item.Name.ToString().Contains(searchterm))
         {
             return true;
         }
@@ -74,8 +100,42 @@ else
         }
         return false;
     }
+    private void AddEditionEvent(string message)
+    {
+        editEvents.Add(message);
+        StateHasChanged();
+    }
+    private void BackupItem(object element)
+    {
+        elementBeforeEdit = new()
+            {
+                Name = ((Products)element).Name
+            };
+        AddEditionEvent($"Событие предварительного просмотра редактирования строки: создана резервная копия элемента {((Products)element).Name}");
+    }
+    private void ResetItemToOriginalValues(object element)
+    {
+        ((Products)element).Name = elementBeforeEdit.Name;
+        AddEditionEvent($"Событие отмены редактирования строки: Редактирование элемента {((Products)element).Name} отмененный");
+    }
+    private async void ItemHasBeenCommitted(object element)
+    {
+        await WarehouseApiClient.UpdateProductsAsync((Products)element);
+        AddEditionEvent($"Событие фиксации редактирования строки: Изменения в элементе {((Products)element).Name} зафиксированы");
+    }
 
-        }
+    private void Add()
+    {
+        DialogOptions closeOnEscapeKey = new DialogOptions()
+            {
+                CloseOnEscapeKey = true
+            };
+
+        DialogService.Show<AddProduct>
+            ("Добавить новый товар", closeOnEscapeKey);
+    }
+    
+}
 
 
 

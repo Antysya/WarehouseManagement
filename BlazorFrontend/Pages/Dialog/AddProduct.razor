@@ -1,0 +1,38 @@
+﻿<MudDialog>
+    <DialogContent>
+        <MudTextField T="string" Label="Наименование" @bind-Value="_newName"></MudTextField>
+        <MudTextField T="string" Label="Артикул" @bind-Value="_newCode"></MudTextField>
+        <MudTextField T="ProductGroup" Label="Товарная группа" @bind-Value="_newProductGroup"></MudTextField>
+        <MudTextField T="ProductStatuses" Label="Артикул" @bind-Value="_newProductStatuses"></MudTextField>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Отменить</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Add">Сохранить</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    private IEnumerable<Products> _types;
+    private string _newName = "";
+    private string _newCode = "";
+    private int _newBoxSiz = 0;
+    private ProductGroup _newProductGroup = new();
+    private ProductStatuses _newProductStatuses = new();
+    void Cancel() => MudDialog.Cancel();
+
+    private async Task Add()
+    {
+        Products newItem = new()
+            {
+                Name = _newName,
+                Code= _newCode,
+                BoxSize=_newBoxSiz,
+
+            };
+        await WarehouseApiClient.AddProductsAsync(newItem);
+        _types = await WarehouseApiClient.GetProductsAsync();
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+}

@@ -155,5 +155,114 @@ namespace HttpApiClient
             var item = await response.Content.ReadFromJsonAsync<ProductStatusInOrder>();
             return item!;
         }
+
+        //Основные, просмотр, редактирование, добавление, удаление
+        //Products
+        public async Task<IEnumerable<Products>> GetProductsAsync()
+        {
+            var uri = $"{_host}/api/products/get_all";
+            var item = await _httpClient.GetFromJsonAsync<IEnumerable<Products>>(uri);
+            return item!;
+        }
+        public async Task<Products> AddProductsAsync(Products element)
+        {
+            var uri = $"{_host}/api/products/add";
+            var response = await _httpClient.PostAsJsonAsync(uri, element);
+            response.EnsureSuccessStatusCode();
+
+            var item = await response.Content.ReadFromJsonAsync<Products>();
+            return item!;
+        }
+        public async Task<Products> UpdateProductsAsync(Products element)
+        {
+            var uri = $"{_host}/api/products/update";
+            var response = await _httpClient.PostAsJsonAsync(uri, element);
+            response.EnsureSuccessStatusCode();
+
+            var item = await response.Content.ReadFromJsonAsync<Products>();
+            return item!;
+        }
+
+        public async Task<Products> RemoveProductsAsync(Products element)
+        {
+            var uri = $"{_host}/api/products/remove";
+            var response = await _httpClient.PostAsJsonAsync(uri, element);
+            response.EnsureSuccessStatusCode();
+
+            var item = await response.Content.ReadFromJsonAsync<Products>();
+            return item!;
+        }
+
+        //ProductsInOrders
+        public async Task<IEnumerable<ProductsInOrders>> GetProductsInOrdersAsync()
+        {
+            var uri = $"{_host}/api/products-in-orders/get_all";
+            var item = await _httpClient.GetFromJsonAsync<IEnumerable<ProductsInOrders>>(uri);
+            return item!;
+        }
+        public async Task<ProductsInOrders> AddProductsInOrdersAsync(ProductsInOrders element)
+        {
+            var uri = $"{_host}/api/products-in-orders/add";
+            var response = await _httpClient.PostAsJsonAsync(uri, element);
+            response.EnsureSuccessStatusCode();
+
+            var item = await response.Content.ReadFromJsonAsync<ProductsInOrders>();
+            return item!;
+        }
+        public async Task<ProductsInOrders> UpdateProductsInOrdersAsync(ProductsInOrders element)
+        {
+            var uri = $"{_host}/api/products-in-orders/update";
+            var response = await _httpClient.PostAsJsonAsync(uri, element);
+            response.EnsureSuccessStatusCode();
+
+            var item = await response.Content.ReadFromJsonAsync<ProductsInOrders>();
+            return item!;
+        }
+
+        public async Task<ProductsInOrders> RemoveProductsInOrdersAsync(ProductsInOrders element)
+        {
+            var uri = $"{_host}/api/products-in-orders/remove";
+            var response = await _httpClient.PostAsJsonAsync(uri, element);
+            response.EnsureSuccessStatusCode();
+
+            var item = await response.Content.ReadFromJsonAsync<ProductsInOrders>();
+            return item!;
+        }
+
+        //ProductsOnShelves
+        public async Task<IEnumerable<ProductsOnShelves>> GetProductsOnShelvesAsync()
+        {
+            var uri = $"{_host}/api/products-on-shelves/get_all";
+            var item = await _httpClient.GetFromJsonAsync<IEnumerable<ProductsOnShelves>>(uri);
+            return item!;
+        }
+        public async Task<ProductsOnShelves> AddProductsOnShelvesAsync(ProductsOnShelves element)
+        {
+            var uri = $"{_host}/api/products-on-shelves/add";
+            var response = await _httpClient.PostAsJsonAsync(uri, element);
+            response.EnsureSuccessStatusCode();
+
+            var item = await response.Content.ReadFromJsonAsync<ProductsOnShelves>();
+            return item!;
+        }
+        public async Task<ProductsOnShelves> UpdateProductsOnShelvesAsync(ProductsOnShelves element)
+        {
+            var uri = $"{_host}/api/products-on-shelves/update";
+            var response = await _httpClient.PostAsJsonAsync(uri, element);
+            response.EnsureSuccessStatusCode();
+
+            var item = await response.Content.ReadFromJsonAsync<ProductsOnShelves>();
+            return item!;
+        }
+
+        public async Task<ProductsOnShelves> RemoveProductsOnShelvesAsync(ProductsOnShelves element)
+        {
+            var uri = $"{_host}/api/products-on-shelves/remove";
+            var response = await _httpClient.PostAsJsonAsync(uri, element);
+            response.EnsureSuccessStatusCode();
+
+            var item = await response.Content.ReadFromJsonAsync<ProductsOnShelves>();
+            return item!;
+        }
     }
 }

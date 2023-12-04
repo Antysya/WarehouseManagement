@@ -18,8 +18,6 @@ namespace DataModel
         public int MinimumStock { get; set; }
         public int MaximumShelfLife { get; set; }
 
-        public ICollection<ProductsInOrders> ProductsInOrders { get; set; }
-        public ICollection<ProductsOnShelves> ProductsOnShelves { get; set; }
         [ForeignKey("ProductGroupId")]
         public ProductGroup ProductGroup { get; set; }
         [ForeignKey("ProductStatusId")]
