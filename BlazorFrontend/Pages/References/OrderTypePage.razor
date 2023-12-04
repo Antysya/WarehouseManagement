@@ -1,18 +1,14 @@
 ﻿@page "/references/order-type"
-@using WarehouseManagerClient.Pages.Dialog;
-@inject HttpApiClient.WarehouseApiClient WarehouseApiClient;
-@inject ISnackbar Snackbar
-@inject IDialogService DialogService
 
-<h1>Типы заказов</h1>
+<h3>Типы заказов</h3>
 
-@if (Types == null)
+@if (types == null)
 {
     <p><em>Загрузка...</em></p>
 }
 else
 {
-    <MudTable Items="@Types" Hover="true" Striped="true" Dense="false" FixedHeader="true"
+    <MudTable Items="@types" Hover="true" Striped="true" Dense="false" FixedHeader="true"
               CanCancelEdit="true" RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues"
               RowEditCommit="ItemHasBeenCommitted" ReadOnly="false" @bind-SelectedItem="selectedItem1"
               CommitEditTooltip="Commit Edit" OnCommitEditClick="@(() => Snackbar.Add("Вызван обработчик редактирования фиксации"))"
@@ -52,15 +48,15 @@ else
 
 }
 @code {
-    protected IReadOnlyList<OrderTypes> Types;
+    protected IEnumerable<OrderTypes> types;
     string searchterm = "";
-    private OrderTypes elementBeforeEdit;
-    private OrderTypes selectedItem1 = null;
+    private OrderTypes elementBeforeEdit = new();
+    private OrderTypes selectedItem1;
     private List<string> editEvents = new();
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        Types = await WarehouseApiClient.GetOrderTypesAsync();
+        types = await WarehouseApiClient.GetOrderTypesAsync();
     }
     private bool FilterCycleCheck(OrderTypes item)
     {
@@ -92,10 +88,12 @@ else
         ((OrderTypes)element).Name = elementBeforeEdit.Name;
         AddEditionEvent($"Событие отмены редактирования строки: Редактирование элемента {((OrderTypes)element).Name} отмененный");
     }
-    private void ItemHasBeenCommitted(object element)
+    private async void ItemHasBeenCommitted(object element)
     {
+        await WarehouseApiClient.UpdateOrderTypeAsync((OrderTypes)element);
         AddEditionEvent($"Событие фиксации редактирования строки: Изменения в элементе {((OrderTypes)element).Name} зафиксированы");
     }
+
     private void Add()
     {
         DialogOptions closeOnEscapeKey = new DialogOptions()
@@ -104,6 +102,6 @@ else
             };
 
         DialogService.Show<AddOrderType>
-            ("Новый тип", closeOnEscapeKey);
+            ("Добавить новый тип", closeOnEscapeKey);
     }
 }

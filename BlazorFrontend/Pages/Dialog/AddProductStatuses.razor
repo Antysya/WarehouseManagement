@@ -11,19 +11,19 @@
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
-    private IEnumerable<OrderTypes> _types;
+    private IEnumerable<ProductStatuses> _types;
     private int _newId;
     private string _newName = "";
     void Cancel() => MudDialog.Cancel();
 
     private async Task Add()
     {
-        OrderTypes newItem = new()
+        ProductStatuses newItem = new()
             {
                 Name = _newName
             };
-        await WarehouseApiClient.AddOrderTypesAsync(newItem);
-        _types = await WarehouseApiClient.GetOrderTypesAsync();
+        await WarehouseApiClient.AddProductStatusesAsync(newItem);
+        _types = await WarehouseApiClient.GetProductStatusesAsync();
         MudDialog.Close(DialogResult.Ok(true));
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Json;
+using System.Xml.Linq;
 using DataModel;
 
 
@@ -22,50 +23,137 @@ namespace HttpApiClient
             _host = host;
         }
 
-        public async Task<List<Products>> GetProductsAsync()
+        //справочники. Можно просматривать, добавлять, отредактировать
+
+        //OrderTypes
+        public async Task<IEnumerable<OrderTypes>> GetOrderTypesAsync()
         {
-            var uri = $"{_host}/api/products";
-            var products = await _httpClient.GetFromJsonAsync<List<Products>>(uri);
-            return products!;
+            var uri = $"{_host}/api/order-type/get_all";
+            var item = await _httpClient.GetFromJsonAsync<IEnumerable<OrderTypes>>(uri);
+            return item!;
+        }
+        public async Task<OrderTypes> AddOrderTypesAsync(OrderTypes element)
+        {
+            var uri = $"{_host}/api/order-type/add";
+            var response = await _httpClient.PostAsJsonAsync(uri, element);
+            response.EnsureSuccessStatusCode();
+
+            var item = await response.Content.ReadFromJsonAsync<OrderTypes>();
+            return item!;
         }
 
-        public async Task<List<ProductsOnShelves>> GetPlacementAsync()
+        public async Task<OrderTypes> UpdateOrderTypeAsync(OrderTypes element)
         {
-            var uri = $"{_host}/api/placement";
-            var products = await _httpClient.GetFromJsonAsync<List<ProductsOnShelves>>(uri);
-            return products!;
+            var uri = $"{_host}/api/order-type/update";
+            var response = await _httpClient.PostAsJsonAsync(uri, element);
+            response.EnsureSuccessStatusCode();
+
+            var item = await response.Content.ReadFromJsonAsync<OrderTypes>();
+            return item!;
         }
 
-        public async Task<IReadOnlyList<OrderTypes>> GetOrderTypesAsync()
+        //OrderStatuses
+        public async Task<IEnumerable<OrderStatuses>> GetOrderStatusesAsync()
         {
-            var uri = $"{_host}/api/order-type";
-            var type = await _httpClient.GetFromJsonAsync<IReadOnlyList<OrderTypes>>(uri);
-            return type!;
+            var uri = $"{_host}/api/order-statuses/get_all";
+            var item = await _httpClient.GetFromJsonAsync<IEnumerable<OrderStatuses>>(uri);
+            return item!;
         }
-        public async Task<IReadOnlyList<OrderStatuses>> GetOrderStatusesAsync()
+        public async Task<OrderStatuses> AddOrderStatusesAsync(OrderStatuses element)
         {
-            var uri = $"{_host}/api/order-statuses";
-            var type = await _httpClient.GetFromJsonAsync<IReadOnlyList<OrderStatuses>>(uri);
-            return type!;
+            var uri = $"{_host}/api/order-statuses/add";
+            var response = await _httpClient.PostAsJsonAsync(uri, element);
+            response.EnsureSuccessStatusCode();
+
+            var item = await response.Content.ReadFromJsonAsync<OrderStatuses>();
+            return item!;
+        }
+        public async Task<OrderStatuses> UpdateOrderStatusesAsync(OrderStatuses element)
+        {
+            var uri = $"{_host}/api/order-statuses/update";
+            var response = await _httpClient.PostAsJsonAsync(uri, element);
+            response.EnsureSuccessStatusCode();
+
+            var item = await response.Content.ReadFromJsonAsync<OrderStatuses>();
+            return item!;
         }
 
-        public async Task<IReadOnlyList<ProductGroup>> GetProductGroupAsync()
+        //ProductGroup
+        public async Task<IEnumerable<ProductGroup>> GetProductGroupAsync()
         {
-            var uri = $"{_host}/api/product-group";
-            var type = await _httpClient.GetFromJsonAsync<IReadOnlyList<ProductGroup>>(uri);
-            return type!;
+            var uri = $"{_host}/api/product-group/get_all";
+            var item = await _httpClient.GetFromJsonAsync<IEnumerable<ProductGroup>>(uri);
+            return item!;
         }
-        public async Task<IReadOnlyList<ProductStatuses>> GetProductStatusesAsync()
+        public async Task<ProductGroup> AddProductGroupAsync(ProductGroup element)
         {
-            var uri = $"{_host}/api/product-status";
-            var type = await _httpClient.GetFromJsonAsync<IReadOnlyList<ProductStatuses>>(uri);
-            return type!;
+            var uri = $"{_host}/api/product-group/add";
+            var response = await _httpClient.PostAsJsonAsync(uri, element);
+            response.EnsureSuccessStatusCode();
+
+            var item = await response.Content.ReadFromJsonAsync<ProductGroup>();
+            return item!;
         }
-        public async Task<IReadOnlyList<ProductStatusInOrder>> GetProductStatusInOrderAsync()
+        public async Task<ProductGroup> UpdateProductGroupAsync(ProductGroup element)
         {
-            var uri = $"{_host}/api/product-in-order";
-            var type = await _httpClient.GetFromJsonAsync<IReadOnlyList<ProductStatusInOrder>>(uri);
-            return type!;
+            var uri = $"{_host}/api/product-group/update";
+            var response = await _httpClient.PostAsJsonAsync(uri, element);
+            response.EnsureSuccessStatusCode();
+
+            var item = await response.Content.ReadFromJsonAsync<ProductGroup>();
+            return item!;
+        }
+
+        //ProductStatuses
+        public async Task<IEnumerable<ProductStatuses>> GetProductStatusesAsync()
+        {
+            var uri = $"{_host}/api/product-statuses/get_all";
+            var item = await _httpClient.GetFromJsonAsync<IEnumerable<ProductStatuses>>(uri);
+            return item!;
+        }
+        public async Task<ProductStatuses> AddProductStatusesAsync(ProductStatuses element)
+        {
+            var uri = $"{_host}/api/product-statuses/add";
+            var response = await _httpClient.PostAsJsonAsync(uri, element);
+            response.EnsureSuccessStatusCode();
+
+            var item = await response.Content.ReadFromJsonAsync<ProductStatuses>();
+            return item!;
+        }
+        public async Task<ProductStatuses> UpdateProductStatusesAsync(ProductStatuses element)
+        {
+            var uri = $"{_host}/api/product-statuses/update";
+            var response = await _httpClient.PostAsJsonAsync(uri, element);
+            response.EnsureSuccessStatusCode();
+
+            var item = await response.Content.ReadFromJsonAsync<ProductStatuses>();
+            return item!;
+        }
+
+        //ProductStatusInOrder
+        public async Task<IEnumerable<ProductStatusInOrder>> GetProductStatusInOrderAsync()
+        {
+            var uri = $"{_host}/api/product-status-in-order/get_all";
+            var item = await _httpClient.GetFromJsonAsync<IEnumerable<ProductStatusInOrder>>(uri);
+            return item!;
+        }
+        public async Task<ProductStatusInOrder> AddProductStatusInOrderAsync(ProductStatusInOrder element)
+        {
+            var uri = $"{_host}/api/product-status-in-order/add";
+            var response = await _httpClient.PostAsJsonAsync(uri, element);
+            response.EnsureSuccessStatusCode();
+
+            var item = await response.Content.ReadFromJsonAsync<ProductStatusInOrder>();
+            return item!;
+        }
+        public async Task<ProductStatusInOrder> UpdateProductStatusInOrderAsync(ProductStatusInOrder element)
+        {
+            var uri = $"{_host}/api/product-status-in-order/update";
+            var response = await _httpClient.PostAsJsonAsync(uri, element);
+            response.EnsureSuccessStatusCode();
+
+            var item = await response.Content.ReadFromJsonAsync<ProductStatusInOrder>();
+            return item!;
         }
     }
 }

@@ -1,19 +1,31 @@
 ﻿@page "/references/product-group"
-@inject HttpApiClient.WarehouseApiClient WarehouseApiClient;
 
-<h1>Товарные группы</h1>
+<h3>Товарные группы</h3>
 
-@if (Types == null)
+@if (types == null)
 {
     <p><em>Загрузка...</em></p>
 }
 else
 {
-    <MudTable Items="@Types" Hover="true" Striped="true" SortLabel="Sort By" Filter="new Func<ProductGroup, bool>(FilterCycleCheck)">
+    <MudTable Items="@types" Hover="true" Striped="true" Dense="false" FixedHeader="true"
+              CanCancelEdit="true" RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues"
+              RowEditCommit="ItemHasBeenCommitted" ReadOnly="false" @bind-SelectedItem="selectedItem1"
+              CommitEditTooltip="Commit Edit" OnCommitEditClick="@(() => Snackbar.Add("Вызван обработчик редактирования фиксации"))"
+              IsEditRowSwitchingBlocked="false"
+              ApplyButtonPosition="TableApplyButtonPosition.End" EditButtonPosition="TableEditButtonPosition.End"
+              EditTrigger="TableEditTrigger.RowClick"
+              SortLabel="Sort By" Filter="new Func<ProductGroup, bool>(FilterCycleCheck)">
         <ToolBarContent>
-            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" href='/product-status/add'>Добавить</MudButton>
-            <MudTextField @bind-Value="@searchterm" Placeholder="Поиск по наименованию" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0" Style="margin-left:70%"></MudTextField>
+            <MudButton @onclick="Add" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary">Добавить</MudButton>
+            <MudTextField @bind-Value="@searchterm" Placeholder="Поиск" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0" Style="margin-left:70%"></MudTextField>
         </ToolBarContent>
+        <ColGroup>
+            <col style="width:50px;" />
+            <col />
+            <col style="width:50%;" />
+
+        </ColGroup>
         <HeaderContent>
             <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<ProductGroup, object>(x=>x.Id)">Идентификатор</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<ProductGroup, object>(x=>x.Name)">Наименование</MudTableSortLabel></MudTh>
@@ -22,18 +34,27 @@ else
             <MudTd DataLabel="Идентификатор">@context.Id</MudTd>
             <MudTd DataLabel="Наименование">@context.Name</MudTd>
         </RowTemplate>
+        <RowEditingTemplate>
+            <MudTd DataLabel="Идентификатор">@context.Id</MudTd>
+            <MudTd DataLabel="Наименование">
+                <MudTextField @bind-Value="@context.Name" Required />
+            </MudTd>
+        </RowEditingTemplate>
         <PagerContent>
             <MudTablePager RowsPerPageString="Строк на странице:" PageSizeOptions="new int[]{10,20}" />
         </PagerContent>
     </MudTable>
 }
 @code {
-    protected IReadOnlyList<ProductGroup> Types;
+    protected IEnumerable<ProductGroup> types;
     string searchterm = "";
+    private ProductGroup elementBeforeEdit = new();
+    private ProductGroup selectedItem1;
+    private List<string> editEvents = new();
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        Types = await WarehouseApiClient.GetProductGroupAsync();
+        types = await WarehouseApiClient.GetProductGroupAsync();
     }
     private bool FilterCycleCheck(ProductGroup item)
     {
@@ -46,5 +67,39 @@ else
             return true;
         }
         return false;
+    }
+    private void AddEditionEvent(string message)
+    {
+        editEvents.Add(message);
+        StateHasChanged();
+    }
+    private void BackupItem(object element)
+    {
+        elementBeforeEdit = new()
+            {
+                Name = ((ProductGroup)element).Name
+            };
+        AddEditionEvent($"Событие предварительного просмотра редактирования строки: создана резервная копия элемента {((ProductGroup)element).Name}");
+    }
+    private void ResetItemToOriginalValues(object element)
+    {
+        ((ProductGroup)element).Name = elementBeforeEdit.Name;
+        AddEditionEvent($"Событие отмены редактирования строки: Редактирование элемента {((ProductGroup)element).Name} отмененный");
+    }
+    private async void ItemHasBeenCommitted(object element)
+    {
+        await WarehouseApiClient.UpdateProductGroupAsync((ProductGroup)element);
+        AddEditionEvent($"Событие фиксации редактирования строки: Изменения в элементе {((ProductGroup)element).Name} зафиксированы");
+    }
+
+    private void Add()
+    {
+        DialogOptions closeOnEscapeKey = new DialogOptions()
+            {
+                CloseOnEscapeKey = true
+            };
+
+        DialogService.Show<AddProductGroup>
+            ("Добавить новую продуктовую группу", closeOnEscapeKey);
     }
 }

@@ -1,19 +1,31 @@
 ﻿@page "/references/product-type"
-@inject HttpApiClient.WarehouseApiClient WarehouseApiClient;
 
-<h1>Типы товаров</h1>
+<h3>Типы товаров</h3>
 
-@if (Types == null)
+@if (types == null)
 {
     <p><em>Загрузка...</em></p>
 }
 else
 {
-    <MudTable Items="@Types" Hover="true" Striped="true" SortLabel="Sort By" Filter="new Func<ProductStatuses, bool>(FilterCycleCheck)">
+    <MudTable Items="@types" Hover="true" Striped="true" Dense="false" FixedHeader="true"
+              CanCancelEdit="true" RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues"
+              RowEditCommit="ItemHasBeenCommitted" ReadOnly="false" @bind-SelectedItem="selectedItem1"
+              CommitEditTooltip="Commit Edit" OnCommitEditClick="@(() => Snackbar.Add("Вызван обработчик редактирования фиксации"))"
+              IsEditRowSwitchingBlocked="false"
+              ApplyButtonPosition="TableApplyButtonPosition.End" EditButtonPosition="TableEditButtonPosition.End"
+              EditTrigger="TableEditTrigger.RowClick"
+              SortLabel="Sort By" Filter="new Func<ProductStatuses, bool>(FilterCycleCheck)">
         <ToolBarContent>
-            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" href='/product-status/add'>Добавить</MudButton>
-            <MudTextField @bind-Value="@searchterm" Placeholder="Поиск по наименованию" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0" Style="margin-left:70%"></MudTextField>
+            <MudButton @onclick="Add" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary">Добавить</MudButton>
+            <MudTextField @bind-Value="@searchterm" Placeholder="Поиск" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0" Style="margin-left:70%"></MudTextField>
         </ToolBarContent>
+        <ColGroup>
+            <col style="width:50px;" />
+            <col />
+            <col style="width:50%;" />
+
+        </ColGroup>
         <HeaderContent>
             <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<ProductStatuses, object>(x=>x.Id)">Идентификатор</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<ProductStatuses, object>(x=>x.Name)">Наименование</MudTableSortLabel></MudTh>
@@ -22,18 +34,27 @@ else
             <MudTd DataLabel="Идентификатор">@context.Id</MudTd>
             <MudTd DataLabel="Наименование">@context.Name</MudTd>
         </RowTemplate>
+        <RowEditingTemplate>
+            <MudTd DataLabel="Идентификатор">@context.Id</MudTd>
+            <MudTd DataLabel="Наименование">
+                <MudTextField @bind-Value="@context.Name" Required />
+            </MudTd>
+        </RowEditingTemplate>
         <PagerContent>
             <MudTablePager RowsPerPageString="Строк на странице:" PageSizeOptions="new int[]{10,20}" />
         </PagerContent>
     </MudTable>
 }
 @code {
-    protected IReadOnlyList<ProductStatuses> Types;
+    protected IEnumerable<ProductStatuses> types;
     string searchterm = "";
+    private ProductStatuses elementBeforeEdit = new();
+    private ProductStatuses selectedItem1;
+    private List<string> editEvents = new();
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        Types = await WarehouseApiClient.GetProductStatusesAsync();
+        types = await WarehouseApiClient.GetProductStatusesAsync();
     }
     private bool FilterCycleCheck(ProductStatuses item)
     {
@@ -46,6 +67,40 @@ else
             return true;
         }
         return false;
+    }
+    private void AddEditionEvent(string message)
+    {
+        editEvents.Add(message);
+        StateHasChanged();
+    }
+    private void BackupItem(object element)
+    {
+        elementBeforeEdit = new()
+            {
+                Name = ((ProductStatuses)element).Name
+            };
+        AddEditionEvent($"Событие предварительного просмотра редактирования строки: создана резервная копия элемента {((ProductStatuses)element).Name}");
+    }
+    private void ResetItemToOriginalValues(object element)
+    {
+        ((ProductStatuses)element).Name = elementBeforeEdit.Name;
+        AddEditionEvent($"Событие отмены редактирования строки: Редактирование элемента {((ProductStatuses)element).Name} отмененный");
+    }
+    private async void ItemHasBeenCommitted(object element)
+    {
+        await WarehouseApiClient.UpdateProductStatusesAsync((ProductStatuses)element);
+        AddEditionEvent($"Событие фиксации редактирования строки: Изменения в элементе {((ProductStatuses)element).Name} зафиксированы");
+    }
+
+    private void Add()
+    {
+        DialogOptions closeOnEscapeKey = new DialogOptions()
+            {
+                CloseOnEscapeKey = true
+            };
+
+        DialogService.Show<AddProductStatuses>
+            ("Добавить новый статус", closeOnEscapeKey);
     }
 }
 

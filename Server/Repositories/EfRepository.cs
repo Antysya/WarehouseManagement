@@ -30,14 +30,14 @@ namespace Server.Repositories
 
         public virtual async Task Update(TEntity entity, CancellationToken cancellationToken = default)
         {
-            _dbContext.Entry(entity).State = EntityState.Modified;
+            _entities.Entry(entity).State = EntityState.Modified;
             await _dbContext.SaveChangesAsync(cancellationToken);
             
         }
 
         public virtual Task Remove(TEntity entity, CancellationToken cancellationToken = default)
         {
-            _dbContext.Remove(entity);
+            _entities.Remove(entity);
             return _dbContext.SaveChangesAsync(cancellationToken);
         }
     }

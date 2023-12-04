@@ -1,5 +1,4 @@
 ﻿@page "/placement"
-@inject HttpApiClient.WarehouseApiClient WarehouseApiClient;
 
 <h3>Размещение товаров</h3>
 
@@ -32,7 +31,7 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        products = await WarehouseApiClient.GetPlacementAsync();
+        //products = await WarehouseApiClient.GetPlacementAsync();
     }
     private bool FilterCycleCheck(ProductsOnShelves item)
     {
