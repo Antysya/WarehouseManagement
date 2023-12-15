@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -9,12 +10,12 @@ namespace DataModel
 {
     public class ProductsInOrders : IEntity
     {
+        [Key]
         public int Id { get; init; }
         public int ProductId { get; set; }
         public int OrderId { get; set; }
         public int Quantity { get; set; }
         public int StatusId { get; set; }
-
         [ForeignKey("ProductId")]
         public Products Products { get; set; }
         [ForeignKey("OrderId")]

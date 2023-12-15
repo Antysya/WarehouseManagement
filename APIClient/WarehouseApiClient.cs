@@ -264,5 +264,57 @@ namespace HttpApiClient
             var item = await response.Content.ReadFromJsonAsync<ProductsOnShelves>();
             return item!;
         }
+
+        //Orders
+        public async Task<IEnumerable<Orders>> GetOrdersAsync()
+        {
+            var uri = $"{_host}/api/orders/get_all";
+            var item = await _httpClient.GetFromJsonAsync<IEnumerable<Orders>>(uri);
+            return item!;
+        }
+        public async Task<Orders> AddProductsOnShelvesAsync(Orders element)
+        {
+            var uri = $"{_host}/api/orders/add";
+            var response = await _httpClient.PostAsJsonAsync(uri, element);
+            response.EnsureSuccessStatusCode();
+
+            var item = await response.Content.ReadFromJsonAsync<Orders>();
+            return item!;
+        }
+        public async Task<Orders> UpdateOrdersAsync(Orders element)
+        {
+            var uri = $"{_host}/api/orders/update";
+            var response = await _httpClient.PostAsJsonAsync(uri, element);
+            response.EnsureSuccessStatusCode();
+
+            var item = await response.Content.ReadFromJsonAsync<Orders>();
+            return item!;
+        }
+
+        public async Task<Orders> RemoveOrdersAsync(Orders element)
+        {
+            var uri = $"{_host}/api/orders/remove";
+            var response = await _httpClient.PostAsJsonAsync(uri, element);
+            response.EnsureSuccessStatusCode();
+
+            var item = await response.Content.ReadFromJsonAsync<Orders>();
+            return item!;
+        }
+
+        //Заказ отчет
+        public async Task<IEnumerable<OrderReport>> GetReportOrders(string order)
+        {
+            var uri = $"{_host}/api/reports/get?name={order}";
+            var item = await _httpClient.GetFromJsonAsync<IEnumerable<OrderReport>>(uri);
+            return item!;
+        }
+
+        //Пополнить отчет
+        public async Task<IEnumerable<ReplenishReport>> GetReplenishReport()
+        {
+            var uri = $"{_host}/api/reports/replenish";
+            var item = await _httpClient.GetFromJsonAsync<IEnumerable<ReplenishReport>>(uri);
+            return item!;
+        }
     }
 }

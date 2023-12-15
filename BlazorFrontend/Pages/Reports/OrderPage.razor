@@ -1,0 +1,68 @@
+﻿@page "/report/order"
+
+<MudGrid Spacing="10" Justify="Justify.Center" Style="margin-bottom:10px" >
+    <MudItem >
+        <MudTextField @bind-Value="searchterm" Placeholder="Введите номер заказа" Variant="Variant.Filled" Style="width:200px; background:none"></MudTextField>
+    </MudItem>
+    <MudItem Style="margin-top: 20px">
+        <MudButton OnClick="LoadOrder" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary">Загрузить</MudButton>
+    </MudItem>
+</MudGrid>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <p>@errorMessage</p>
+}
+else if (order == null)
+{
+    <p><em>Загрузка...</em></p>
+}
+else if (order != null)
+{
+    <h3>Заказ №@searchterm</h3>
+    <MudTable Items="@order" Dense="true">
+        <HeaderContent>
+            <MudTh>Товар</MudTh>
+            <MudTh>Артикул</MudTh>
+            <MudTh>Количество</MudTh>
+            <MudTh>Размещение</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>
+                <MudText>@context.Product</MudText>
+            </MudTd>
+            <MudTd>
+                <MudText>@context.Code</MudText>
+            </MudTd>
+            <MudTd>
+                <MudText>@context.Quantity</MudText>
+            </MudTd>
+            <MudTd>
+                <MudText>@context.Placement</MudText>
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+    <MudButton Style="margin-top: 20px" @onclick="async () => await ExportToWord()" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FileDownload" Color="Color.Primary">Export to PDF</MudButton>
+}
+
+
+@code {
+    protected IEnumerable<OrderReport> order;
+    string searchterm = "";
+    string errorMessage = "";
+    private async Task LoadOrder()
+    {
+        order = await WarehouseApiClient.GetReportOrders(searchterm);
+        if (order == null || !order.Any())
+        {
+            order = null; // Очистка данных, если заказ не найден
+            errorMessage = "Заказ с указанным номером не найден.";
+        }
+    }
+
+    public async Task ExportToWord()
+    {
+        
+    }
+   
+}

@@ -9,40 +9,40 @@ namespace Server.Controllers
     //[ApiController]
     public class ProductsOnShelvesController : ControllerBase
     {
-        private readonly IRepository<ProductsOnShelves> repository;
-        public ProductsOnShelvesController(IRepository<ProductsOnShelves> dbContext)
+        private readonly IProductsOnShelvesRepository _repository;
+        public ProductsOnShelvesController(IProductsOnShelvesRepository repository)
         {
-            repository = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         }
 
         [HttpGet("get_all")]
         public async Task<IEnumerable<ProductsOnShelves>> GetProductsOnShelves(CancellationToken cancellationToken)
         {
-            return await repository.GetAll(cancellationToken);
+            return await _repository.GetAll(cancellationToken);
         }
 
         [HttpGet("get")]
         public async Task<ProductsOnShelves> GetProductById(int id, CancellationToken cancellationToken)
         {
-            return await repository.GetById(id, cancellationToken);
+            return await _repository.GetById(id, cancellationToken);
         }
 
         [HttpPost("add")]
         public async Task AddProductOnShelves([FromBody] ProductsOnShelves productsOnShelves, CancellationToken cancellationToken)
         {
-            await repository.Add(productsOnShelves, cancellationToken);
+            await _repository.Add(productsOnShelves, cancellationToken);
         }
 
         [HttpPost("update")]
         public async Task UpdateProductOnShelves([FromBody] ProductsOnShelves productsOnShelves, CancellationToken cancellationToken)
         {
-            await repository.Update(productsOnShelves, cancellationToken);
+            await _repository.Update(productsOnShelves, cancellationToken);
         }
 
         [HttpPost("remove")]
         public async Task RemoveProductOnShelves([FromBody] ProductsOnShelves productsOnShelves, CancellationToken cancellationToken)
         {
-            await repository.Remove(productsOnShelves, cancellationToken);
+            await _repository.Remove(productsOnShelves, cancellationToken);
         }
     }
 }

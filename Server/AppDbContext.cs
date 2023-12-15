@@ -15,6 +15,7 @@ namespace Server
         public DbSet<OrderStatuses> OrderStatuses => Set<OrderStatuses>();
         public DbSet<ProductStatusInOrder> ProductStatusInOrder => Set<ProductStatusInOrder>();
         public DbSet<ProductsOnShelves> ProductsOnShelves => Set<ProductsOnShelves>();
+        public DbSet<ProductsInOrders> ProductsInOrders => Set<ProductsInOrders>();
         public AppDbContext(
             DbContextOptions<AppDbContext> options)
             : base(options)

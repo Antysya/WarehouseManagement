@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,7 @@ namespace DataModel
 {
     public class ProductsOnShelves : IEntity
     {
+        [Key]
         public int Id { get; init; }
         public int ProductId { get; set; }
         public int ShelveId { get; set; }

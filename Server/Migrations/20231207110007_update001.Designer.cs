@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Server;
 
@@ -11,9 +12,11 @@ using Server;
 namespace Server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231207110007_update001")]
+    partial class update001
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -177,37 +180,6 @@ namespace Server.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("DataModel.ProductsInOrders", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<int>("StatusId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrderId");
-
-                    b.HasIndex("ProductId");
-
-                    b.HasIndex("StatusId");
-
-                    b.ToTable("ProductsInOrders");
-                });
-
             modelBuilder.Entity("DataModel.ProductsOnShelves", b =>
                 {
                     b.Property<int>("Id")
@@ -301,33 +273,6 @@ namespace Server.Migrations
                     b.Navigation("ProductStatuses");
                 });
 
-            modelBuilder.Entity("DataModel.ProductsInOrders", b =>
-                {
-                    b.HasOne("DataModel.Orders", "Orders")
-                        .WithMany()
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DataModel.Products", "Products")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DataModel.ProductStatusInOrder", "ProductStatusInOrder")
-                        .WithMany()
-                        .HasForeignKey("StatusId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Orders");
-
-                    b.Navigation("ProductStatusInOrder");
-
-                    b.Navigation("Products");
-                });
-
             modelBuilder.Entity("DataModel.ProductsOnShelves", b =>
                 {
                     b.HasOne("DataModel.Products", "Products")
@@ -337,7 +282,7 @@ namespace Server.Migrations
                         .IsRequired();
 
                     b.HasOne("DataModel.Shelving", "Shelving")
-                        .WithMany()
+                        .WithMany("ProductsOnShelves")
                         .HasForeignKey("ShelveId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -345,6 +290,11 @@ namespace Server.Migrations
                     b.Navigation("Products");
 
                     b.Navigation("Shelving");
+                });
+
+            modelBuilder.Entity("DataModel.Shelving", b =>
+                {
+                    b.Navigation("ProductsOnShelves");
                 });
 #pragma warning restore 612, 618
         }

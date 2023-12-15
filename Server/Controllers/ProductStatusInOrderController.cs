@@ -9,40 +9,40 @@ namespace Server.Controllers
     //[ApiController]
     public class ProductStatusInOrderController : ControllerBase
     {
-        private readonly IRepository<ProductStatusInOrder> repository;
-        public ProductStatusInOrderController(IRepository<ProductStatusInOrder> dbContext)
+        private readonly IRepository<ProductStatusInOrder> _repository;
+        public ProductStatusInOrderController(IRepository<ProductStatusInOrder> repository)
         {
-            repository = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         }
 
         [HttpGet("get_all")]
         public async Task<IEnumerable<ProductStatusInOrder>> GetProductStatusInOrder(CancellationToken cancellationToken)
         {
-            return await repository.GetAll(cancellationToken);
+            return await _repository.GetAll(cancellationToken);
         }
 
         [HttpGet("get")]
         public async Task<ProductStatusInOrder> GetProductStatusInOrderById(int id, CancellationToken cancellationToken)
         {
-            return await repository.GetById(id, cancellationToken);
+            return await _repository.GetById(id, cancellationToken);
         }
 
         [HttpPost("add")]
         public async Task AddProductStatusInOrder([FromBody] ProductStatusInOrder productStatusInOrder, CancellationToken cancellationToken)
         {
-            await repository.Add(productStatusInOrder, cancellationToken);
+            await _repository.Add(productStatusInOrder, cancellationToken);
         }
 
         [HttpPost("update")]
         public async Task UpdateProductStatusInOrder([FromBody] ProductStatusInOrder productStatusInOrder, CancellationToken cancellationToken)
         {
-            await repository.Update(productStatusInOrder, cancellationToken);
+            await _repository.Update(productStatusInOrder, cancellationToken);
         }
 
         [HttpPost("remove")]
         public async Task RemoveProductStatusInOrder([FromBody] ProductStatusInOrder productStatusInOrder, CancellationToken cancellationToken)
         {
-            await repository.Remove(productStatusInOrder, cancellationToken);
+            await _repository.Remove(productStatusInOrder, cancellationToken);
         }
     }
 }

@@ -10,7 +10,7 @@ else
     <MudTable Items="@products" Hover="true" Striped="true" Dense="true" FixedHeader="true"
               CanCancelEdit="true" RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues"
               RowEditCommit="ItemHasBeenCommitted" ReadOnly="false" @bind-SelectedItem="selectedItem1"
-              CommitEditTooltip="Commit Edit" OnCommitEditClick="@(() => Snackbar.Add("Вызван обработчик редактирования фиксации"))"
+              CommitEditTooltip="Commit Edit" OnCommitEditClick="@(() => Snackbar.Add("Сохранение"))"
               IsEditRowSwitchingBlocked="false"
               ApplyButtonPosition="TableApplyButtonPosition.End" EditButtonPosition="TableEditButtonPosition.End"
               EditTrigger="TableEditTrigger.RowClick"
@@ -33,8 +33,8 @@ else
             <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Products, object>(x=>x.Id)">Идентификатор</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Products, object>(x=>x.Name)">Наименование товара</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Products, object>(x=>x.Code)">Артикул</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Products, object>(x=>x.ProductGroup)">Товарная группа</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Products, object>(x=>x.ProductStatuses)">Тип</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Products, object>(x=>x.ProductGroup.Name)">Товарная группа</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Products, object>(x=>x.ProductStatuses.Name)">Тип</MudTableSortLabel></MudTh>
             <MudTh>Минимальный остаток</MudTh>
         </HeaderContent>
         <RowTemplate>
@@ -45,9 +45,9 @@ else
             <MudTd DataLabel="Code">
                 <MudTextField @bind-Value=@context.Code Required></MudTextField>
                 </MudTd>
-            <MudTd DataLabel="ProductGroup">@context.ProductGroup</MudTd>
-            <MudTd DataLabel="ProductStatus">@context.ProductStatuses</MudTd>
-            <MudTd DataLabel="MinimumStock">@context.MinimumStock></MudTd>
+            <MudTd DataLabel="ProductGroup">@context.ProductGroup.Name</MudTd>
+            <MudTd DataLabel="ProductStatus">@context.ProductStatuses.Name</MudTd>
+            <MudTd DataLabel="MinimumStock">@context.MinimumStock</MudTd>
         </RowTemplate>
         <RowEditingTemplate>
             <MudTd DataLabel="Идентификатор">@context.Id</MudTd>
@@ -57,8 +57,22 @@ else
             <MudTd DataLabel="Code">
                 <MudTextField @bind-Value=@context.Code Required></MudTextField>
             </MudTd>
-            <MudTd DataLabel="ProductGroup">@context.ProductGroup</MudTd>
-            <MudTd DataLabel="ProductStatus">@context.ProductStatuses</MudTd>
+            <MudTd DataLabel="ProductGroup">
+                <MudSelect @bind-Value=@context.ProductGroup.Name>
+                    @foreach (var group in groups)
+                    {
+                        <MudSelectItem Value="group.Name" Label="group.Name" />
+                    }
+                </MudSelect>
+            </MudTd>
+            <MudTd DataLabel="ProductStatus">
+                <MudSelect @bind-Value=@context.ProductStatuses.Name>
+                    @foreach (var status in statuses)
+                    {
+                        <MudSelectItem Value="status.Name" Label="status.Name" />
+                    }
+                </MudSelect>
+            </MudTd>
             <MudTd DataLabel="MinimumStock">
                 <MudTextField @bind-Value=@context.MinimumStock Required></MudTextField>
                 </MudTd>
@@ -71,30 +85,34 @@ else
 
 @code {
     protected IEnumerable<Products> products;
+    protected IEnumerable<ProductGroup> groups;
+    protected IEnumerable<ProductStatuses> statuses;
     string searchterm = "";
     private Products elementBeforeEdit = new();
     private Products selectedItem1;
     private List<string> editEvents = new();
     protected override async Task OnInitializedAsync()
     {
+        products = await WarehouseApiClient.GetProductsAsync();
+        groups = await WarehouseApiClient.GetProductGroupAsync();
         await base.OnInitializedAsync();
-        products = await WarehouseApiClient.GetProductsAsync();        
     }
+
     private bool FilterCycleCheck(Products item)
     {
         if (item.Name.Contains(searchterm))
         {
             return true;
         }
-        if (item.Name.ToString().Contains(searchterm))
+        if (item.Code.Contains(searchterm))
         {
             return true;
         }
-        if (item.ProductStatusId.ToString().Contains(searchterm))
+        if (item.ProductGroup.Name.Contains(searchterm))
         {
             return true;
         }
-        if (item.ProductGroupId.ToString().Contains(searchterm))
+        if (item.ProductStatuses.Name.Contains(searchterm))
         {
             return true;
         }
@@ -109,7 +127,15 @@ else
     {
         elementBeforeEdit = new()
             {
-                Name = ((Products)element).Name
+                Name = ((Products)element).Name,
+                Code = ((Products)element).Code,
+                BoxSize = ((Products)element).BoxSize,
+                ProductGroupId = ((Products)element).ProductGroupId,
+                ProductStatusId = ((Products)element).ProductStatusId,
+                MinimumStock = ((Products)element).MinimumStock,
+                MaximumShelfLife = ((Products)element).MaximumShelfLife,
+                ProductGroup = ((Products)element).ProductGroup,
+                ProductStatuses = ((Products)element).ProductStatuses
             };
         AddEditionEvent($"Событие предварительного просмотра редактирования строки: создана резервная копия элемента {((Products)element).Name}");
     }
@@ -134,7 +160,6 @@ else
         DialogService.Show<AddProduct>
             ("Добавить новый товар", closeOnEscapeKey);
     }
-    
 }
 
 

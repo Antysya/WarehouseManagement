@@ -9,40 +9,40 @@ namespace Server.Controllers
     [ApiController]
     public class OrderStatusesController : ControllerBase
     {
-        private readonly IRepository<OrderStatuses> repository;
-        public OrderStatusesController(IRepository<OrderStatuses> dbContext)
+        private readonly IRepository<OrderStatuses> _repository;
+        public OrderStatusesController(IRepository<OrderStatuses> repository)
         {
-            repository = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         }
 
         [HttpGet("get_all")]
         public async Task<IEnumerable<OrderStatuses>> GetOrderStatuses(CancellationToken cancellationToken)
         {
-            return await repository.GetAll(cancellationToken);
+            return await _repository.GetAll(cancellationToken);
         }
 
         [HttpGet("get")]
         public async Task<OrderStatuses> GetOrderStatusById(int id, CancellationToken cancellationToken)
         {
-            return await repository.GetById(id, cancellationToken);
+            return await _repository.GetById(id, cancellationToken);
         }
 
         [HttpPost("add")]
         public async Task AddOrderStatus([FromBody] OrderStatuses orderStatuses, CancellationToken cancellationToken)
         {
-            await repository.Add(orderStatuses, cancellationToken);
+            await _repository.Add(orderStatuses, cancellationToken);
         }
 
         [HttpPost("update")]
         public async Task UpdateOrderStatus([FromBody] OrderStatuses orderStatuses, CancellationToken cancellationToken)
         {
-            await repository.Update(orderStatuses, cancellationToken);
+            await _repository.Update(orderStatuses, cancellationToken);
         }
 
         [HttpPost("remove")]
         public async Task RemoveOrderStatus([FromBody] OrderStatuses orderStatuses, CancellationToken cancellationToken)
         {
-            await repository.Remove(orderStatuses, cancellationToken);
+            await _repository.Remove(orderStatuses, cancellationToken);
         }
     }
 }

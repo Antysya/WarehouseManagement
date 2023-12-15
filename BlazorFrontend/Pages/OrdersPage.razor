@@ -1,0 +1,200 @@
+﻿@page "/orders"
+<h3>Заказы</h3>
+
+@if (types == null)
+{
+    <p><em>Загрузка...</em></p>
+}
+else
+{
+    <MudGrid>
+        <MudItem Style="width: 49%;">
+            <MudTable Items="@types" Hover="true" Striped="true" Dense="false" FixedHeader="true"
+                      CanCancelEdit="true" RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues"
+                      RowEditCommit="ItemHasBeenCommitted" ReadOnly="false" @bind-SelectedItem="selectedItem1"
+                      CommitEditTooltip="Commit Edit" OnCommitEditClick="@(() => Snackbar.Add("Сохранение"))"
+                      IsEditRowSwitchingBlocked="false"
+                      ApplyButtonPosition="TableApplyButtonPosition.End" EditButtonPosition="TableEditButtonPosition.End"
+                      EditTrigger="TableEditTrigger.RowClick"
+                      SortLabel="Sort By" Filter="new Func<Orders, bool>(FilterCycleCheck)">
+                <ToolBarContent>
+                   <MudTextField @bind-Value="@searchterm" Placeholder="Поиск" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0" Style="margin-left:70%"></MudTextField>
+                </ToolBarContent>
+                <ColGroup>
+                    <col style="width:50px;" />
+                    <col style="width:50px;" />
+                    <col style="width:50px;" />
+                    <col style="width:50px;" />
+                    <col style="width:50px;" />
+
+                </ColGroup>
+                <HeaderContent>
+                    <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Orders, object>(x=>x.Id)">п/п</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Orders, object>(x=>x.Name)">Номер</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Orders, object>(x=>x.OrderTypes.Name)">Тип</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Orders, object>(x=>x.OrderStatuses.Name)">Статус</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Orders, object>(x=>x.TimeCreate)">Создана</MudTableSortLabel></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="п/п">@context.Id</MudTd>
+                    <MudTd DataLabel="Номер">@context.Name</MudTd>
+                    <MudTd DataLabel="Тип">@context.OrderTypes.Name</MudTd>
+                    <MudTd DataLabel="Статус">@context.OrderStatuses.Name</MudTd>
+                    <MudTd DataLabel="Создана">@context.TimeCreate</MudTd>
+                </RowTemplate>
+                <RowEditingTemplate>
+                    <MudTd DataLabel="п/п">@context.Id</MudTd>
+                    <MudTd DataLabel="Номер">
+                        <MudTextField @bind-Value="@context.Name" Required />
+                    </MudTd>
+                    <MudTd DataLabel="Тип">@context.OrderTypes.Name</MudTd>
+                    <MudTd DataLabel="Статус">
+                        <MudTextField @bind-Value="@context.OrderStatuses.Name" Required />
+                    </MudTd>
+                    <MudTd DataLabel="Создана">@context.TimeCreate</MudTd>
+                </RowEditingTemplate>
+                <PagerContent>
+                    <MudTablePager RowsPerPageString="Строк на странице:" PageSizeOptions="new int[]{10,20}" />
+                </PagerContent>
+            </MudTable>
+        </MudItem>
+        <MudItem Style="width: 49%;">
+            <MudTable Items="@products" Hover="true" Striped="true" Dense="false" FixedHeader="true"
+                      CanCancelEdit="true" ReadOnly="false" @bind-SelectedItem="selectedItem2"
+                      CommitEditTooltip="Commit Edit" OnCommitEditClick="@(() => Snackbar.Add("Вызван обработчик редактирования фиксации"))"
+                      IsEditRowSwitchingBlocked="false"
+                      ApplyButtonPosition="TableApplyButtonPosition.End" EditButtonPosition="TableEditButtonPosition.End"
+                      EditTrigger="TableEditTrigger.RowClick"
+                      SortLabel="Sort By" Filter="new Func<ProductsInOrders, bool>(FilterCycleCheckProducts)">
+                <ToolBarContent>
+                    <MudTextField @bind-Value="@searchterm" Placeholder="Поиск" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0" Style="margin-left:70%"></MudTextField>
+                </ToolBarContent>
+                <ColGroup>
+                    <col style="width:50px;" />
+                    <col style="width:50px;" />
+                    <col style="width:50px;" />
+                    <col style="width:50px;" />
+                    <col style="width:50px;" />
+
+                </ColGroup>
+                <HeaderContent>
+                    <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<ProductsInOrders, object>(x=>x.Id)">п/п</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<ProductsInOrders, object>(x=>x.Products.Name)">Товар</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<ProductsInOrders, object>(x=>x.Orders.Name)">Заказ</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<ProductsInOrders, object>(x=>x.Quantity)">Количество</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<ProductsInOrders, object>(x=>x.ProductStatusInOrder.Name)">Статус</MudTableSortLabel></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="п/п">@context.Id</MudTd>
+                    <MudTd DataLabel="Товар">@context.Products.Name</MudTd>
+                    <MudTd DataLabel="Заказ">@context.Orders.Name</MudTd>
+                    <MudTd DataLabel="Количество">@context.Quantity</MudTd>
+                    <MudTd DataLabel="Статус">@context.ProductStatusInOrder.Name</MudTd>
+                </RowTemplate>
+                <RowEditingTemplate>
+                    <MudTd DataLabel="п/п">@context.Id</MudTd>
+                    <MudTd DataLabel="Товар">@context.Products.Name</MudTd>
+                    <MudTd DataLabel="Заказ">@context.Orders.Name</MudTd>
+                    <MudTd DataLabel="Количество">@context.Quantity</MudTd>
+                    <MudTd DataLabel="Статус">
+                        <MudSelect @bind-Value=@context.ProductStatusInOrder.Name>
+                            @foreach (var status in statuses)
+                            {
+                                <MudSelectItem Value="status.Name" Label="status.Name" />
+                            }
+                        </MudSelect>
+                    </MudTd>
+                </RowEditingTemplate>
+                <PagerContent>
+                    <MudTablePager RowsPerPageString="Строк на странице:" PageSizeOptions="new int[]{10,20}" />
+                </PagerContent>
+            </MudTable>
+        </MudItem>
+    </MudGrid>
+}
+@code {
+    protected IEnumerable<Orders> types;
+    protected IEnumerable<ProductsInOrders> products;
+    protected IEnumerable<ProductStatusInOrder> statuses;
+    private Orders elementBeforeEdit = new();
+    private Orders selectedItem1;
+    private List<string> editEvents = new();
+    string searchterm1 = "";
+    string searchterm = "";
+    private ProductsInOrders elementBeforeEdit2 = new();
+    private ProductsInOrders selectedItem2;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        types = await WarehouseApiClient.GetOrdersAsync();
+        products = await WarehouseApiClient.GetProductsInOrdersAsync();
+        statuses = await WarehouseApiClient.GetProductStatusInOrderAsync();
+    }
+    private bool FilterCycleCheck(Orders item)
+    {
+        if (item.Name.Contains(searchterm))
+        {
+            return true;
+        }
+        if (item.Id.ToString().Contains(searchterm))
+        {
+            return true;
+        }
+        return false;
+    }
+    private void AddEditionEvent(string message)
+    {
+        editEvents.Add(message);
+        StateHasChanged();
+    }
+    private void BackupItem(object element)
+    {
+        elementBeforeEdit = new()
+            {
+                Name = ((Orders)element).Name
+            };
+        AddEditionEvent($"Событие предварительного просмотра редактирования строки: создана резервная копия элемента {((Orders)element).Name}");
+    }
+    private void ResetItemToOriginalValues(object element)
+    {
+        ((Orders)element).Name = elementBeforeEdit.Name;
+        AddEditionEvent($"Событие отмены редактирования строки: Редактирование элемента {((Orders)element).Name} отмененный");
+    }
+    private async void ItemHasBeenCommitted(object element)
+    {
+        await WarehouseApiClient.UpdateOrdersAsync((Orders)element);
+        AddEditionEvent($"Событие фиксации редактирования строки: Изменения в элементе {((Orders)element).Name} зафиксированы");
+    }
+
+    private void Add()
+    {
+        DialogOptions closeOnEscapeKey = new DialogOptions()
+            {
+                CloseOnEscapeKey = true
+            };
+
+        DialogService.Show<AddOrder>
+            ("Добавить заказ", closeOnEscapeKey);
+    }
+
+    private bool FilterCycleCheckProducts(ProductsInOrders item)
+    {
+        if (item.Orders.Name.ToString().Contains(searchterm))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    private void AddProducts()
+    {
+        DialogOptions closeOnEscapeKey = new DialogOptions()
+            {
+                CloseOnEscapeKey = true
+            };
+
+        DialogService.Show<AddProductsInOrders>
+            ("Добавить товар в заказ", closeOnEscapeKey);
+    }
+}

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,7 @@ namespace DataModel
 {
     public class Products : IEntity
     {
+        [Key]
         public int Id { get; init; }
         public string Name { get; set; } = null!;
         public string Code { get; set; } = null!;
@@ -22,7 +24,6 @@ namespace DataModel
         public ProductGroup ProductGroup { get; set; }
         [ForeignKey("ProductStatusId")]
         public ProductStatuses ProductStatuses { get; set; }
-
 
     }
 }

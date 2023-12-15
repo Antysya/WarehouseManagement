@@ -1,0 +1,59 @@
+﻿@page "/report/remains"
+
+@if (order == null)
+{
+    <p><em>Загрузка...</em></p>
+}
+else if (order != null)
+{
+    <h3>На складе заканчивается:</h3>
+    <MudTable Items="@order" Dense="true">
+        <HeaderContent>
+            <MudTh>Товар</MudTh>
+            <MudTh>Артикул</MudTh>
+            <MudTh>Товарная группа</MudTh>
+            <MudTh>Тип</MudTh>
+            <MudTh>Допустимый минимальный остаток</MudTh>
+            <MudTh>Остаток на складе</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>
+                <MudText>@context.Product</MudText>
+            </MudTd>
+            <MudTd>
+                <MudText>@context.Code</MudText>
+            </MudTd>
+            <MudTd>
+                <MudText>@context.Group</MudText>
+            </MudTd>
+            <MudTd>
+                <MudText>@context.Status</MudText>
+            </MudTd>
+            <MudTd>
+                <MudText>@context.MinimumStock</MudText>
+            </MudTd>
+            <MudTd>
+                <MudText>@context.Quantity</MudText>
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+    
+}
+
+
+@code {
+    protected IEnumerable<ReplenishReport> order;
+    string searchterm = "";
+    string errorMessage = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+            order = await WarehouseApiClient.GetReplenishReport();
+    }
+
+    public async Task ExportToWord()
+    {
+        
+    }
+   
+}

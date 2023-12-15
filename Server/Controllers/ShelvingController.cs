@@ -9,40 +9,40 @@ namespace Server.Controllers
     //[ApiController]
     public class ShelvingController : ControllerBase
     {
-        private readonly IRepository<Shelving> repository;
-        public ShelvingController(IRepository<Shelving> dbContext)
+        private readonly IRepository<Shelving> _repository;
+        public ShelvingController(IRepository<Shelving> repository)
         {
-            repository = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         }
 
         [HttpGet("get_all")]
         public async Task<IEnumerable<Shelving>> GetShelving(CancellationToken cancellationToken)
         {
-            return await repository.GetAll(cancellationToken);
+            return await _repository.GetAll(cancellationToken);
         }
 
         [HttpGet("get")]
         public async Task<Shelving> GetShelvingById(int id, CancellationToken cancellationToken)
         {
-            return await repository.GetById(id, cancellationToken);
+            return await _repository.GetById(id, cancellationToken);
         }
 
         [HttpPost("add")]
         public async Task AddShelving([FromBody] Shelving shelving, CancellationToken cancellationToken)
         {
-            await repository.Add(shelving, cancellationToken);
+            await _repository.Add(shelving, cancellationToken);
         }
 
         [HttpPost("update")]
         public async Task UpdateShelving([FromBody] Shelving shelving, CancellationToken cancellationToken)
         {
-            await repository.Update(shelving, cancellationToken);
+            await _repository.Update(shelving, cancellationToken);
         }
 
         [HttpPost("remove")]
         public async Task RemoveShelving([FromBody] Shelving shelving, CancellationToken cancellationToken)
         {
-            await repository.Remove(shelving, cancellationToken);
+            await _repository.Remove(shelving, cancellationToken);
         }
     }
 }

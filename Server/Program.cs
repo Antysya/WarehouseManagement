@@ -19,6 +19,11 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 builder.Services.AddCors();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
+builder.Services.AddScoped<IProductsRepository, ProductsRepository>();
+builder.Services.AddScoped<IOrdersRepository, OrderRepository>();
+builder.Services.AddScoped<IProductsInOrdersRepository, ProductsInOrdersRepository>();
+builder.Services.AddScoped<IProductsOnShelvesRepository, ProductsOnShelvesRepository>();
+builder.Services.AddScoped<IReportsRepository, EfReportRepository>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

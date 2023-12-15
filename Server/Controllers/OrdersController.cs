@@ -11,40 +11,40 @@ namespace Server.Controllers
     //[ApiController]
     public class OrdersController : ControllerBase
     {
-        private readonly IRepository<Orders> repository;
-        public OrdersController(IRepository<Orders> dbContext)
+        private readonly IOrdersRepository _repository;
+        public OrdersController(IOrdersRepository repository)
         {
-            repository = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         }
 
         [HttpGet("get_all")]
         public async Task<IEnumerable<Orders>> GetOrders(CancellationToken cancellationToken)
         {
-            return await repository.GetAll(cancellationToken);
+            return await _repository.GetAll(cancellationToken);
         }
 
         [HttpGet("get")]
         public async Task<Orders> GetOrderById(int id, CancellationToken cancellationToken)
         {
-            return await repository.GetById(id, cancellationToken);
+            return await _repository.GetById(id, cancellationToken);
         }
 
         [HttpPost("add")]
         public async Task AddOrder([FromBody] Orders orders, CancellationToken cancellationToken)
         {
-            await repository.Add(orders, cancellationToken);
+            await _repository.Add(orders, cancellationToken);
         }
 
         [HttpPost("update")]
         public async Task UpdateOrder([FromBody] Orders orders, CancellationToken cancellationToken)
         {
-            await repository.Update(orders, cancellationToken);
+            await _repository.Update(orders, cancellationToken);
         }
 
         [HttpPost("remove")]
         public async Task RemoveOrder([FromBody] Orders orders, CancellationToken cancellationToken)
         {
-            await repository.Remove(orders, cancellationToken);
+            await _repository.Remove(orders, cancellationToken);
         }
 
     }
