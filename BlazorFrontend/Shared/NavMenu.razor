@@ -1,5 +1,8 @@
-﻿<MudNavMenu>
-    <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Главная</MudNavLink>
+﻿@inject IdentityAuthenticationStateProvider authStateProvider
+<MudNavMenu>
+    <!--<MudNavLink Href="/login" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Вход в систему</MudNavLink>-->
+    <!--<MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Главная</MudNavLink>-->
+
     <MudNavLink Href="/orders" Icon="@Icons.Material.Filled.ShoppingCart">Заказы</MudNavLink>
     <MudNavLink Href="/placement" Icon="@Icons.Material.Filled.ProductionQuantityLimits">Размещение товаров</MudNavLink>
     <MudNavLink Href="products" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Каталог товаров</MudNavLink>
@@ -10,8 +13,40 @@
         <MudNavLink Href="/references/order-type" Icon="@Icons.Material.Filled.Bookmark">Типы заказов</MudNavLink>
         <MudNavLink Href="/references/order-status" Icon="@Icons.Material.Filled.Bookmark">Статусы заказов</MudNavLink>
     </MudNavGroup>
-    <MudNavGroup Title="Отчеты" Icon="@Icons.Material.Filled.ShowChart" Expanded="false">
-        <MudNavLink Href="/report/remains" Icon="@Icons.Material.Filled.ShoppingCart">Остатки на складе</MudNavLink>
-        <MudNavLink Href="/report/order" Icon="@Icons.Material.Filled.BarChart">Заказ</MudNavLink>
-    </MudNavGroup>
+
+    @if (!IsAdmin)
+    {
+        <MudNavGroup Title="Отчеты" Icon="@Icons.Material.Filled.ShowChart" Expanded="false">
+            @if (IsBoss)
+            {
+                <MudNavLink Href="/report/remains" Icon="@Icons.Material.Filled.ShoppingCart">Остатки на складе</MudNavLink>
+            }
+            @if (IsUser)
+            {
+                <MudNavLink Href="/report/order" Icon="@Icons.Material.Filled.BarChart">Заказ</MudNavLink>
+            }
+
+        </MudNavGroup>
+    }
+
+    @if (IsAdmin)
+    {
+        <MudNavGroup Title="Администрирование" Icon="@Icons.Material.Filled.Settings" Expanded="false">
+            <MudNavLink Href="/add_user" Icon="@Icons.Material.Filled.PersonAdd">Пользователи</MudNavLink>
+        </MudNavGroup>
+    }
+
 </MudNavMenu>
+
+@code {
+    private bool IsAdmin;
+    private bool IsBoss;
+    private bool IsUser;
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsAdmin = await authStateProvider.UserHasRole("1");
+        IsBoss = await authStateProvider.UserHasRole("2");
+        IsUser = await authStateProvider.UserHasRole("3");
+    }
+}

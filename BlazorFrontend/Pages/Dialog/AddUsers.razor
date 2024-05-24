@@ -1,0 +1,41 @@
+﻿@inject AuthorizeApi AuthorizeApi
+
+<MudDialog>
+    <DialogContent>
+        <MudTextField T="string" Label="Логин" @bind-Value="_newLogin"></MudTextField>
+        <MudTextField T="string" Label="Пароль" @bind-Value="_newPassword"></MudTextField>
+        <MudTextField T="int" Label="Роль" @bind-Value="_newRole"></MudTextField>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Отменить</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Add">Сохранить</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    private IEnumerable<Users> _users;
+    private int _newId;
+    private string _newLogin = "";
+    private string _newPassword = "";
+    private int _newRole = 0;
+    void Cancel() => MudDialog.Cancel();
+
+    private async Task Add()
+    {
+        try
+        {
+            var login = _newLogin;
+            var password = _newPassword;
+            var role = _newRole;
+            await AuthorizeApi.Register(login, password,role);
+            _users = await WarehouseApiClient.GetUsersAsync();
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        catch
+        {
+            
+        }
+    }
+}

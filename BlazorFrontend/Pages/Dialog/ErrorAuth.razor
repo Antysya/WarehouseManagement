@@ -1,0 +1,14 @@
+﻿<MudDialog>
+    <DialogContent>
+        <MudText>Пользователь не найден. Проверьте введенные данные.</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Отменить</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    void Cancel() => MudDialog.Cancel();
+}

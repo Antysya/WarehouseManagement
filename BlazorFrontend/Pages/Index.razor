@@ -1,43 +1,128 @@
 ﻿@page "/"
+@using Radzen
+@using Radzen.Blazor
+@using Microsoft.AspNetCore.Authorization
+@inject AuthorizeApi AuthorizeApi
+@inject NavigationManager Nav
+@inject IdentityAuthenticationStateProvider authStateProvider
+@layout LoginLayout
 
-<PageTitle>Управление складом</PageTitle>
-<MudGrid Spacing="10" Justify="Justify.Center">
-    <MudItem>
-        <MudChip Color="Color.Primary" Href="/orders" Icon="@Icons.Material.Filled.ShoppingCart" Style="height:200px; width:200px; margin:10px">Заказы</MudChip>
-    </MudItem>
-    <MudItem>
-        <MudChip Color="Color.Primary" Href="/placement" Icon="@Icons.Material.Filled.ProductionQuantityLimits" Style="height:200px; width:200px; margin:10px">Размещение товаров</MudChip>
-    </MudItem>
-    <MudItem>
-        <MudChip Color="Color.Primary" Href="products" Icon="@Icons.Material.Filled.List" Style="height:200px; width:200px; margin:10px">Каталог товаров</MudChip>
-    </MudItem>
-    <MudItem>
-        <MudMenu FullWidth="true">
-            <ActivatorContent>
-                <MudChip Icon="@Icons.Material.Filled.Menu" Color="Color.Primary" Style="height:200px; width:200px; margin:10px">Справочники</MudChip>
-            </ActivatorContent>
-            <ChildContent>
-                <MudMenuItem Href="/references/product-group">Товарные группы</MudMenuItem>
-                <MudMenuItem Href="/references/product-type">Типы товаров</MudMenuItem>
-                <MudMenuItem Href="/references/product-status">Статусы товаров в заказе</MudMenuItem>
-                <MudMenuItem Href="/references/order-type">Типы заказов</MudMenuItem>
-                <MudMenuItem Href="/references/order-status">Статусы заказов</MudMenuItem>
-            </ChildContent>
-        </MudMenu>
-    </MudItem>
-    <MudItem>
-        <MudMenu FullWidth="true">
-            <ActivatorContent>
-                <MudChip Icon="@Icons.Material.Filled.ShowChart" Color="Color.Primary" Style="height:200px; width:200px; margin:10px">Отчеты</MudChip>
-            </ActivatorContent>
-            <ChildContent>
-                <MudMenuItem Href="/report/remains">Остатки на складе</MudMenuItem>
-                <MudMenuItem Href="/report/order">Заказ</MudMenuItem>
-            </ChildContent>
-        </MudMenu>
-    </MudItem>
-</MudGrid>
+<AuthorizeView>
+    <NotAuthorized>
+
+        <RadzenCard class="rz-my-12 rz-mx-auto rz-p-4 rz-p-md-12" style="max-width: 600px;">
+            <h3>Вход в систему</h3>
+            <br />
+            <RadzenTemplateForm Data=@("Localization") Context="LoginFormContext">
+                <RadzenLogin Login="@OnLogin"
+                             AllowRegister="false"
+                             AllowResetPassword="false"
+                             LoginText="Войти"
+                             UserText="Логин"
+                             PasswordText="Пароль"
+                             UserRequired="Введите логин"
+                             PasswordRequired="Введите пароль"
+                             ResetPasswordText="Изменить пароль"
+                             />
+            </RadzenTemplateForm>
+        </RadzenCard>
+
+    </NotAuthorized>
+
+    <Authorized>
+        <MudThemeProvider />
+        <MudDialogProvider />
+        <MudSnackbarProvider />
+        <PageTitle>Управление складом</PageTitle>
+        <MudGrid Spacing="10" Justify="Justify.Center">
+            <MudItem>
+                <MudChip Color="Color.Primary" Href="/orders" Icon="@Icons.Material.Filled.ShoppingCart" Style="height:200px; width:200px; margin:10px">Заказы</MudChip>
+            </MudItem>
+            <MudItem>
+                <MudChip Color="Color.Primary" Href="/placement" Icon="@Icons.Material.Filled.ProductionQuantityLimits" Style="height:200px; width:200px; margin:10px">Размещение товаров</MudChip>
+            </MudItem>
+            <MudItem>
+                <MudChip Color="Color.Primary" Href="/products" Icon="@Icons.Material.Filled.List" Style="height:200px; width:200px; margin:10px">Каталог товаров</MudChip>
+            </MudItem>
+            <MudItem>
+                <MudMenu FullWidth="true">
+                    <ActivatorContent>
+                        <MudChip Icon="@Icons.Material.Filled.Menu" Color="Color.Primary" Style="height:200px; width:200px; margin:10px">Справочники</MudChip>
+                    </ActivatorContent>
+                    <ChildContent>
+                        <MudMenuItem Href="/references/product-group">Товарные группы</MudMenuItem>
+                        <MudMenuItem Href="/references/product-type">Типы товаров</MudMenuItem>
+                        <MudMenuItem Href="/references/product-status">Статусы товаров в заказе</MudMenuItem>
+                        <MudMenuItem Href="/references/order-type">Типы заказов</MudMenuItem>
+                        <MudMenuItem Href="/references/order-status">Статусы заказов</MudMenuItem>
+                    </ChildContent>
+                </MudMenu>
+            </MudItem>
+            @if (!IsAdmin)
+            {
+                <MudItem>
+                    <MudMenu FullWidth="true">
+                        <ActivatorContent>
+                            <MudChip Icon="@Icons.Material.Filled.ShowChart" Color="Color.Primary" Style="height:200px; width:200px; margin:10px">Отчеты</MudChip>
+                        </ActivatorContent>
+                        <ChildContent>
+                            @if (IsBoss)
+                            {
+                                <MudMenuItem Href="/report/remains">Остатки на складе</MudMenuItem>
+                            }
+                            @if (IsUser)
+                            {
+                                <MudMenuItem Href="/report/order">Заказ</MudMenuItem>
+                            }
+                        </ChildContent>
+                    </MudMenu>
+                </MudItem>
+            }
+            
+            @if (IsAdmin)
+            {
+                <MudItem>
+                    <MudMenu FullWidth="true">
+                        <ActivatorContent>
+                            <MudChip Icon="@Icons.Material.Filled.Settings" Color="Color.Primary" Style="height:200px; width:200px; margin:10px">Администрирование</MudChip>
+                        </ActivatorContent>
+                        <ChildContent>
+                            <MudMenuItem Href="/users">Пользователи</MudMenuItem>
+                        </ChildContent>
+                    </MudMenu>
+                </MudItem>
+            }
+        </MudGrid>
+    </Authorized>
+</AuthorizeView>
 
 @code {
-    
+
+    private bool IsAdmin;
+    private bool IsBoss;
+    private bool IsUser;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (authStateProvider == null)
+        {
+            return;
+        }
+
+        IsAdmin = await authStateProvider.UserHasRole("1");
+        IsBoss = await authStateProvider.UserHasRole("2");
+        IsUser = await authStateProvider.UserHasRole("3");
+    }
+
+
+    private async Task OnLogin(LoginArgs arg)
+    {
+        var login = arg.Username;
+        var password = arg.Password;
+
+        var success = await AuthorizeApi.Login(login, password);
+        if (success)
+            Nav.NavigateTo("/home");
+    }
+
 }

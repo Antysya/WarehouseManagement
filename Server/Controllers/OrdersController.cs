@@ -1,4 +1,5 @@
 ﻿using DataModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +9,7 @@ using Server.Repositories.Interfaces;
 namespace Server.Controllers
 {
     [Route("api/orders")]
-    //[ApiController]
+    [ApiController]    
     public class OrdersController : ControllerBase
     {
         private readonly IOrdersRepository _repository;

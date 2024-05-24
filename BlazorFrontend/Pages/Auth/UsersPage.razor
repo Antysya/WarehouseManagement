@@ -1,0 +1,113 @@
+﻿@page "/users"
+
+<h3>Пользователи</h3>
+
+@if (users == null)
+{
+    <p><em>Загрузка...</em></p>
+}
+else
+{
+    <MudTable Items="@users" Hover="true" Striped="true" Dense="false" FixedHeader="true"
+              CanCancelEdit="true" RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues"
+              RowEditCommit="ItemHasBeenCommitted" ReadOnly="false" @bind-SelectedItem="selectedItem1"
+              CommitEditTooltip="Commit Edit" OnCommitEditClick="@(() => Snackbar.Add("Вызван обработчик редактирования фиксации"))"
+              IsEditRowSwitchingBlocked="false"
+              ApplyButtonPosition="TableApplyButtonPosition.End" EditButtonPosition="TableEditButtonPosition.End"
+              EditTrigger="TableEditTrigger.RowClick"
+              SortLabel="Sort By" Filter="new Func<Users, bool>(FilterCycleCheck)">
+        <ToolBarContent>
+            <MudButton @onclick="Add" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary">Добавить</MudButton>
+            <MudTextField @bind-Value="@searchterm" Placeholder="Поиск" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" Class="mt-0" Style="margin-left:70%"></MudTextField>
+        </ToolBarContent>
+        <ColGroup>
+            <col style="width:10%;" />
+            <col style="width:45%;" />
+            <col style="width:45%;" />
+            <col />
+
+        </ColGroup>
+        <HeaderContent>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Users, object>(x=>x.Id)">Идентификатор</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Users, object>(x=>x.Login)">Логин</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Users, object>(x=>x.RoleId)">Роль</MudTableSortLabel></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Идентификатор">@context.Id</MudTd>
+                <MudTd DataLabel="Логин">@context.Login</MudTd>
+                <MudTd DataLabel="Роль">@context.RoleId</MudTd>
+            </RowTemplate>
+            <RowEditingTemplate>
+                <MudTd DataLabel="Идентификатор">@context.Id</MudTd>
+                <MudTd DataLabel="Логин">
+                    <MudTextField @bind-Value="@context.Login" Required />
+             </MudTd>
+             <MudTd DataLabel="Роль">
+                 <MudTextField @bind-Value="@context.RoleId" Required />
+             </MudTd>
+         </RowEditingTemplate>
+         <PagerContent>
+             <MudTablePager RowsPerPageString="Строк на странице:" PageSizeOptions="new int[]{10,20}" />
+         </PagerContent>
+     </MudTable>
+}
+@code {
+    protected IEnumerable<Users> users;
+    string searchterm = "";
+    private Users elementBeforeEdit = new();
+    private Users selectedItem1;
+    private List<string> editEvents = new();
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        users = await WarehouseApiClient.GetUsersAsync();
+    }
+    private bool FilterCycleCheck(Users item)
+    {
+        if (item.Login.Contains(searchterm))
+        {
+            return true;
+        }
+        if (item.Id.ToString().Contains(searchterm))
+        {
+            return true;
+        }
+        return false;
+    }
+    private void AddEditionEvent(string message)
+    {
+        editEvents.Add(message);
+        StateHasChanged();
+    }
+    private void BackupItem(object element)
+    {
+        elementBeforeEdit = new()
+            {
+                Login = ((Users)element).Login,
+                RoleId = ((Users)element).RoleId
+            };
+        AddEditionEvent($"Событие предварительного просмотра редактирования строки: создана резервная копия элемента {((Users)element).Login}");
+    }
+    private void ResetItemToOriginalValues(object element)
+    {
+        ((Users)element).Login = elementBeforeEdit.Login;
+        ((Users)element).RoleId = elementBeforeEdit.RoleId;
+        AddEditionEvent($"Событие отмены редактирования строки: Редактирование элемента {((Users)element).Login} отмененный");
+    }
+    private async void ItemHasBeenCommitted(object element)
+    {
+        await WarehouseApiClient.UpdateUserAsync((Users)element);
+        AddEditionEvent($"Событие фиксации редактирования строки: Изменения в элементе {((Users)element).Login} зафиксированы");
+    }
+
+    private void Add()
+    {
+        DialogOptions closeOnEscapeKey = new DialogOptions()
+            {
+                CloseOnEscapeKey = true
+            };
+
+        DialogService.Show<AddUsers>
+            ("Добавить ", closeOnEscapeKey);
+    }
+}

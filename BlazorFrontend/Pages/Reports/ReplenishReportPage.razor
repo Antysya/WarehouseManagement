@@ -1,4 +1,7 @@
 ﻿@page "/report/remains"
+@inject IJSRuntime js
+@using ClosedXML
+@using ClosedXML.Excel
 
 @if (order == null)
 {
@@ -37,23 +40,21 @@ else if (order != null)
             </MudTd>
         </RowTemplate>
     </MudTable>
+
+    @* <MudButton Style="margin-top: 20px" @onclick="async () => await ExportToExcel()" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FileDownload" Color="Color.Primary">Экспорт в Excel</MudButton> *@
     
 }
 
 
 @code {
+
     protected IEnumerable<ReplenishReport> order;
-    string searchterm = "";
-    string errorMessage = "";
+
 
     protected override async Task OnInitializedAsync()
     {
-            order = await WarehouseApiClient.GetReplenishReport();
+        order = await WarehouseApiClient.GetReplenishReport();
     }
 
-    public async Task ExportToWord()
-    {
-        
-    }
-   
 }
+

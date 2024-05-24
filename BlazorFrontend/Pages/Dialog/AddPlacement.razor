@@ -1,0 +1,26 @@
+﻿<MudDialog>
+   
+    <DialogActions>
+        <MudButton OnClick="Cancel">Отменить</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    private IEnumerable<OrderTypes> _types;
+    private int _newId;
+    private string _newName = "";
+    void Cancel() => MudDialog.Cancel();
+
+    private async Task Add()
+    {
+        OrderTypes newItem = new()
+            {
+                Name = _newName
+            };
+        await WarehouseApiClient.AddOrderTypesAsync(newItem);
+        _types = await WarehouseApiClient.GetOrderTypesAsync();
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+}

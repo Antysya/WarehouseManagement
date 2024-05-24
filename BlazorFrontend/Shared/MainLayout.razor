@@ -1,13 +1,18 @@
 ﻿@inherits LayoutComponentBase
+@inject NavigationManager Nav
+@inject IdentityAuthenticationStateProvider authStateProvider
+@inject IJSRuntime JS
 
+<AuthorizeView>
 <MudThemeProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
 <MudLayout>
     <MudAppBar Elevation="0">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())"/>
         <MudSpacer />
+           <MudIconButton Icon="@Icons.Material.Filled.ExitToApp" Color="Color.Inherit" OnClick="@Logout" />
        @* <MudIconButton Icon="@Icons.Custom.Brands.MudBlazor" Color="Color.Inherit" Link="https://mudblazor.com/" Target="_blank" />
         <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Link="https://github.com/MudBlazor/MudBlazor/" Target="_blank" />*@
     </MudAppBar>
@@ -23,9 +28,16 @@
         </MudContainer>
     </MudMainContent>
 </MudLayout>
+</AuthorizeView>
 
 @code {
     bool _drawerOpen = false;
+
+    private async Task Logout()
+    {
+        await JS.InvokeVoidAsync("localStorage.removeItem", "token");
+        Nav.NavigateTo("/login");
+    }
 
     void DrawerToggle()
     {

@@ -1,0 +1,2 @@
+dotnet ef migrations add имя_миграции
+dotnet ef database update

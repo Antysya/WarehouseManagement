@@ -1,6 +1,10 @@
-﻿using System.Net.Http.Json;
+﻿using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Xml.Linq;
 using DataModel;
+using DataModel.Contracts;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 
 
 namespace HttpApiClient
@@ -22,6 +26,77 @@ namespace HttpApiClient
             _httpClient = httpClient;
             _host = host;
         }
+
+        //регистрация
+        public async Task Register(RegisterUserRequest request)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+
+            var uri = $"{_host}/api/users/register";
+            var response = await _httpClient.PostAsJsonAsync(uri, request);
+            response.EnsureSuccessStatusCode();
+        }
+
+        //авторизация
+        public async Task<string> Authenticate(LoginUserRequest request)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+            var uri = $"{_host}/api/users/login";
+            var response = await _httpClient.PostAsJsonAsync(uri, request);
+            response.EnsureSuccessStatusCode();
+            var token = await response.Content.ReadAsStringAsync();
+
+            return token;
+        }
+
+        //Пользователи
+        public async Task<IEnumerable<Users>> GetUsersAsync()
+        {
+            var uri = $"{_host}/api/users/get_all";
+            var item = await _httpClient.GetFromJsonAsync<IEnumerable<Users>>(uri);
+            return item!;
+        }
+
+        public async Task<Users> UpdateUserAsync(Users element)
+        {
+            var uri = $"{_host}/api/users/update";
+            var response = await _httpClient.PostAsJsonAsync(uri, element);
+            response.EnsureSuccessStatusCode();
+
+            var item = await response.Content.ReadFromJsonAsync<Users>();
+            return item!;
+        }
+
+        //public async Task<IEnumerable<Roles>> GetRolesAsync()
+        //{
+        //    var uri = $"{_host}/api/roles/get_all";
+        //    var item = await _httpClient.GetFromJsonAsync<IEnumerable<Roles>>(uri);
+        //    return item!;
+        //}
+        //public async Task<Roles> AddRolesAsync(Roles element)
+        //{
+        //    var uri = $"{_host}/api/roles/add";
+        //    var response = await _httpClient.PostAsJsonAsync(uri, element);
+        //    response.EnsureSuccessStatusCode();
+
+        //    var item = await response.Content.ReadFromJsonAsync<Roles>();
+        //    return item!;
+        //}
+        //public async Task<Roles> UpdateRolesAsync(Roles element)
+        //{
+        //    var uri = $"{_host}/api/roles/update";
+        //    var response = await _httpClient.PostAsJsonAsync(uri, element);
+        //    response.EnsureSuccessStatusCode();
+
+        //    var item = await response.Content.ReadFromJsonAsync<Roles>();
+        //    return item!;
+        //}
 
         //справочники. Можно просматривать, добавлять, отредактировать
 

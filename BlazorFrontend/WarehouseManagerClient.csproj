@@ -1,15 +1,25 @@
-<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net7.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.7" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.7" PrivateAssets="all" />
-		<PackageReference Include="MudBlazor" Version="6.0.13" />
+	  <Content Remove="Pages\AddUserPage.razor" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
+		<PackageReference Include="ClosedXML" Version="0.102.2" />
+		<PackageReference Include="ClosedXML.Report" Version="0.2.10" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.19" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="7.0.19" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.19" PrivateAssets="all" />
+		<PackageReference Include="MudBlazor" Version="6.19.1" />
+		<PackageReference Include="Radzen.Blazor" Version="4.31.4" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.5.2" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -25,6 +35,18 @@
 
 	<ItemGroup>
 	  <Folder Include="wwwroot\image\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <UpToDateCheckInput Remove="Pages\AddUserPage.razor" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <_ContentIncludedByDefault Remove="Pages\AddUserPage.razor" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="Pages\Auth\UsersPage.razor" />
 	</ItemGroup>
 
 </Project>

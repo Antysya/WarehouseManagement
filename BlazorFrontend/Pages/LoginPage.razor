@@ -1,0 +1,53 @@
+﻿@page "/login"
+@using Radzen
+@using Radzen.Blazor
+@using Microsoft.AspNetCore.Authorization
+@inject AuthorizeApi AuthorizeApi
+@inject NavigationManager Nav
+@layout LoginLayout
+
+<RadzenCard class="rz-my-12 rz-mx-auto rz-p-4 rz-p-md-12" style="max-width: 600px;">
+    <h3>Вход в систему</h3>
+    <br />
+    <RadzenTemplateForm Data=@("Localization") Context="LoginFormContext">
+        <RadzenLogin Login="@OnLogin"
+                     AllowRegister="false"
+                     AllowResetPassword="false"
+                     LoginText="Войти"
+                     UserText="Логин"
+                     PasswordText="Пароль"
+                     UserRequired="Введите логин"
+                     PasswordRequired="Введите пароль"
+                     ResetPasswordText="Изменить пароль" 
+                     />
+    </RadzenTemplateForm>
+</RadzenCard>
+
+@code {
+
+    private async Task OnLogin(LoginArgs arg)
+    {
+        try
+        {
+            var login = arg.Username;
+            var password = arg.Password;
+            var success = await AuthorizeApi.Login(login, password);
+            if (!success)
+            {
+                throw new Exception("Ошибка авторизации. Проверьте введенные данные и попробуйте снова.");
+            }
+            Nav.NavigateTo("/home");
+        }
+        catch (Exception ex)
+        {
+            MudBlazor.DialogOptions closeOnEscapeKey = new MudBlazor.DialogOptions()
+                {
+                    CloseOnEscapeKey = true
+                };
+
+            DialogService.Show<ErrorAuth>
+                ("Ошибка авторизации", closeOnEscapeKey);
+        }
+                
+    }
+}

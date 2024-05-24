@@ -1,4 +1,6 @@
 ﻿@page "/report/order"
+@using ClosedXML.Excel
+@inject IJSRuntime js
 
 <MudGrid Spacing="10" Justify="Justify.Center" Style="margin-bottom:10px" >
     <MudItem >
@@ -42,8 +44,9 @@ else if (order != null)
             </MudTd>
         </RowTemplate>
     </MudTable>
-    <MudButton Style="margin-top: 20px" @onclick="async () => await ExportToWord()" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FileDownload" Color="Color.Primary">Export to PDF</MudButton>
+    <MudButton Style="margin-top: 20px" OnClick="ExportToExcel" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FileDownload" Color="Color.Primary">Экспорт в Excel</MudButton>
 }
+
 
 
 @code {
@@ -56,13 +59,52 @@ else if (order != null)
         if (order == null || !order.Any())
         {
             order = null; // Очистка данных, если заказ не найден
-            errorMessage = "Заказ с указанным номером не найден.";
+            errorMessage = $"Заказ {searchterm} не найден.";
+        }
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await js.InvokeAsync<IJSObjectReference>("import", "/js/BlazorDownloadFile.js");
         }
     }
 
-    public async Task ExportToWord()
+    private async Task ExportToExcel()
     {
-        
-    }
-   
+
+        if (order != null && order.Any())
+        {
+            OrderReport[] data = order.ToArray();
+            var wb = new XLWorkbook();
+            wb.Properties.Author = "the Author";
+            wb.Properties.Title = "the Title";
+            wb.Properties.Subject = "the Subject";
+
+            var ws = wb.Worksheets.Add("list1");
+
+            ws.Cell(1, 1).Value = "Товар";
+            ws.Cell(1, 2).Value = "Артикул";
+            ws.Cell(1, 3).Value = "Количество";
+            ws.Cell(1, 4).Value = "Размещение";
+
+            for (int row = 0; row < data.Length; row++)
+            {
+                ws.Cell(row + 2, 1).Value = data[row].Product;
+                ws.Cell(row + 2, 2).Value = data[row].Code;
+                ws.Cell(row + 2, 3).Value = data[row].Quantity;
+                ws.Cell(row + 2, 4).Value = data[row].Placement;
+            }
+
+            using (var memoryStream = new MemoryStream())
+            {
+                wb.SaveAs(memoryStream);
+                memoryStream.Seek(0, SeekOrigin.Begin);
+                var content = memoryStream.ToArray();
+
+                await js.InvokeVoidAsync("BlazorDownloadFile", $"Заказ_№{searchterm}.xlsx", content);
+            }
+        }
+    }   
 }
+
