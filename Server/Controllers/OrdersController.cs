@@ -24,6 +24,36 @@ namespace Server.Controllers
             return await _repository.GetAll(cancellationToken);
         }
 
+        [HttpGet("get_order_in_progress")]
+        public async Task<IEnumerable<Orders>> GetOrderInProgress(CancellationToken cancellationToken)
+        {
+            return await _repository.GetOrdersInProgress(cancellationToken);
+        }
+
+        [HttpPost("status/{id}")]
+        public async Task<IActionResult> ChangeOrderStatus(int id, [FromHeader] string token, CancellationToken cancellationToken)
+        {
+            if (!await ValidateToken(token))
+            {
+                return Unauthorized("Недействительный токен");
+            }
+
+            var orderToUpdate = await _repository.GetById(id);
+            if (orderToUpdate == null)
+            {
+                return NotFound();
+            }
+            int newStatusId = 4;
+            orderToUpdate.OrderStatusId = newStatusId;
+            await _repository.Update(orderToUpdate, cancellationToken);
+            return Ok();
+        }
+        private async Task<bool> ValidateToken(string token)
+        {
+            // Реализация проверки токена
+            return true;
+        }
+
         [HttpGet("get")]
         public async Task<Orders> GetOrderById(int id, CancellationToken cancellationToken)
         {

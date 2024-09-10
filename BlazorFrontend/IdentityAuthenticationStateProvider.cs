@@ -137,7 +137,7 @@ namespace WarehouseManagerClient
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Ошибка при получении данных о пользователе: {ex.Message}");
+                _logger.LogError($"Ошибка при получении данных о пользователе: {ex.Message}");
                 return null;
             }
         }

@@ -25,5 +25,10 @@ namespace DataModel
         [ForeignKey("ProductStatusId")]
         public ProductStatuses ProductStatuses { get; set; }
 
+        public override string ToString()
+        {
+            return Name;
+        }
+
     }
 }

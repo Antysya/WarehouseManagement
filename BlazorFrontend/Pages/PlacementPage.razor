@@ -14,7 +14,7 @@ else
               CommitEditTooltip="Commit Edit" OnCommitEditClick="@(() => Snackbar.Add("Вызван обработчик редактирования фиксации"))"
               IsEditRowSwitchingBlocked="false"
               ApplyButtonPosition="TableApplyButtonPosition.End" EditButtonPosition="TableEditButtonPosition.End"
-              EditTrigger="TableEditTrigger.RowClick"
+              EditTrigger="TableEditTrigger.EditButton"
               SortLabel="Sort By" Filter="new Func<ProductsOnShelves, bool>(FilterCycleCheck)">
         <ToolBarContent>
             <MudButton @onclick="Add" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary">Добавить</MudButton>
@@ -22,7 +22,7 @@ else
         </ToolBarContent>
         <ColGroup>
             <col style="width:50px;" />
-            <col style="width:50px;" />
+            <col />
             <col style="width:50px;" />
             <col style="width:50px;" />
 
@@ -51,7 +51,7 @@ else
             </MudTd>
         </RowEditingTemplate>
         <PagerContent>
-            <MudTablePager RowsPerPageString="Строк на странице:" PageSizeOptions="new int[]{10,20}" />
+            <MudTablePager RowsPerPageString="Строк на странице:" PageSizeOptions="new int[]{5,10,20}" />
         </PagerContent>
     </MudTable>
 }
@@ -104,7 +104,18 @@ else
     }
     private void ResetItemToOriginalValues(object element)
     {
-        ((ProductsOnShelves)element).Products.Name = elementBeforeEdit.Products.Name;
+        if (element == null)
+        {
+            return;
+        }
+
+        var product = ((ProductsOnShelves)element).Products;
+        if (product == null)
+        {
+            return;
+        }
+
+        product.Name = elementBeforeEdit.Products.Name;
         AddEditionEvent($"Событие отмены редактирования строки: Редактирование элемента {((ProductsOnShelves)element).Products.Name} отмененный");
     }
     private async void ItemHasBeenCommitted(object element)
@@ -120,8 +131,8 @@ else
                 CloseOnEscapeKey = true
             };
 
-        DialogService.Show<AddProduct>
-            ("Добавить новый товар", closeOnEscapeKey);
+        DialogService.Show<AddPlacement>
+            ("Разместить новый товар", closeOnEscapeKey);
     }
 
 }

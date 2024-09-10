@@ -1,7 +1,11 @@
 ﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Runtime.InteropServices;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 using System.Xml.Linq;
 using DataModel;
+using DataModel.Contract;
 using DataModel.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Query.Internal;
@@ -239,14 +243,14 @@ namespace HttpApiClient
             var item = await _httpClient.GetFromJsonAsync<IEnumerable<Products>>(uri);
             return item!;
         }
-        public async Task<Products> AddProductsAsync(Products element)
+        public async Task AddProductsAsync(Products element)
         {
             var uri = $"{_host}/api/products/add";
             var response = await _httpClient.PostAsJsonAsync(uri, element);
             response.EnsureSuccessStatusCode();
 
-            var item = await response.Content.ReadFromJsonAsync<Products>();
-            return item!;
+            //var item = await response.Content.ReadFromJsonAsync<Products>();
+            //return item!;
         }
         public async Task<Products> UpdateProductsAsync(Products element)
         {
@@ -301,6 +305,13 @@ namespace HttpApiClient
             response.EnsureSuccessStatusCode();
 
             var item = await response.Content.ReadFromJsonAsync<ProductsInOrders>();
+            return item!;
+        }
+        //Shelving
+        public async Task<IEnumerable<Shelving>> GetShelvingAsync()
+        {
+            var uri = $"{_host}/api/shelving/get_all";
+            var item = await _httpClient.GetFromJsonAsync<IEnumerable<Shelving>>(uri);
             return item!;
         }
 

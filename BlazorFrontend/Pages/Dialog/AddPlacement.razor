@@ -1,26 +1,85 @@
 ﻿<MudDialog>
-   
+    <DialogContent>
+        <MudTd DataLabel="Product">
+            <MudSelect @bind-Value="_newProducts">
+                @if (_products != null && _products.Any())
+                {
+                    @foreach (var product in _products)
+                    {
+                        <MudSelectItem T="Products" @key="product" Value="@product" Label="@product.Name" />
+                    }
+                }
+                else
+                {
+                    <MudSelectItem T="Products" Value="null" Label="Нет товаров" Disabled="true" />
+                }
+            </MudSelect>
+        </MudTd>
+        <MudTd DataLabel="Shelving">
+            <MudSelect @bind-Value="_newShelving">
+                @if (_shelving != null && _shelving.Any())
+                {
+                    @foreach (var num in _shelving)
+                    {
+                        <MudSelectItem T="Shelving" @key="num" Value="@num" Label="@num.Row" />
+                    }
+                }
+                else
+                {
+                    <MudSelectItem T="Shelving" Value="null" Label="Нет мест" Disabled="true" />
+                }
+            </MudSelect>
+        </MudTd>
+        <MudTextField T="int" Label="Колличество" @bind-Value="_newCount"></MudTextField>
+    </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Отменить</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Add">Сохранить</MudButton>
     </DialogActions>
 </MudDialog>
 
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
-    private IEnumerable<OrderTypes> _types;
-    private int _newId;
-    private string _newName = "";
+    private IEnumerable<Products> _products;
+    private IEnumerable<Shelving> _shelving;
+
+    private Products _newProducts = new();
+    private Shelving _newShelving = new();
+    private int _newCount;
+
+
     void Cancel() => MudDialog.Cancel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _products = await WarehouseApiClient.GetProductsAsync();
+        _shelving = await WarehouseApiClient.GetShelvingAsync();
+
+        if (_products != null && _products.Any())
+        {
+            _newProducts = _products.First();
+        }
+
+        if (_shelving != null && _shelving.Any())
+        {
+            _newShelving = _shelving.First();
+        }
+
+        await base.OnInitializedAsync();
+    }
 
     private async Task Add()
     {
-        OrderTypes newItem = new()
+        ProductsOnShelves newItem = new()
             {
-                Name = _newName
+                ProductId = _newProducts.Id,
+                ShelveId = _newShelving.Id,
+                Quantity = _newCount                
             };
-        await WarehouseApiClient.AddOrderTypesAsync(newItem);
-        _types = await WarehouseApiClient.GetOrderTypesAsync();
+
+        await WarehouseApiClient.AddProductsOnShelvesAsync(newItem);
         MudDialog.Close(DialogResult.Ok(true));
+
     }
-}
+        }

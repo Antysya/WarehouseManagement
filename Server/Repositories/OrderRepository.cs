@@ -16,5 +16,12 @@ namespace Server.Repositories
                 .Include(p => p.OrderStatuses)
                 .ToListAsync(cancellationToken);
         }
+
+        public async Task<IEnumerable<Orders>> GetOrdersInProgress(CancellationToken cancellationToken = default)
+        {
+            return await _entities
+                .Where(o => o.OrderStatusId == 1) // Фильтрация по OrderStatusId
+                .ToListAsync(cancellationToken);
+        }
     }
 }

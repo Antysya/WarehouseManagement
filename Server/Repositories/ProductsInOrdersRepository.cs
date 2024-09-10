@@ -1,4 +1,5 @@
 ﻿using DataModel;
+using DataModel.Contract;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Server.Repositories.Interfaces;
@@ -19,5 +20,24 @@ namespace Server.Repositories
                 .ToListAsync(cancellationToken);
         }
 
+
+        public async Task<IEnumerable<ProductsInOrderResponse>> GetProductsByOrderId(int orderId, CancellationToken cancellationToken = default)
+        {
+            Console.WriteLine($"OrderId: {orderId}");
+            return await _entities
+                .Include(po => po.Products) // Загрузить данные о продукте
+                .Include(po => po.ProductStatusInOrder) // Загрузить статус продукта
+                .Where(po => po.OrderId == orderId) // Применить условие на OrderId
+                .Select(po => new ProductsInOrderResponse
+              
+                {
+                    Id = po.Id,
+                    Name = po.Products.Name,
+                    Quantity = po.Quantity,
+                    Status = po.ProductStatusInOrder.Name,
+                    OrderId = po.OrderId
+                })
+                .ToListAsync(cancellationToken);
+        }
     }
 }

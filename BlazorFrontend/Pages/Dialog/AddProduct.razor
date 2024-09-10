@@ -4,18 +4,32 @@
         <MudTextField T="string" Label="Артикул" @bind-Value="_newCode"></MudTextField>
         <MudTd DataLabel="ProductGroup">
             <MudSelect @bind-Value="_newProductGroup">
-                @foreach (var group in _groups)
+                @if (_groups != null && _groups.Any())
                 {
-                    <MudSelectItem @key="group.Id" Value="@group.Id" Label="@group.Name" />
+                    @foreach (var group in _groups)
+                    {
+                        <MudSelectItem T="ProductGroup" @key="group" Value="@group" Label="@group.Name" />
+                    }
+                }
+                else
+                {
+                    <MudSelectItem T="ProductGroup" Value="null" Label="Нет групп" Disabled="true" />
                 }
             </MudSelect>
         </MudTd>
 
         <MudTd DataLabel="ProductStatus">
             <MudSelect @bind-Value="_newProductStatuses">
-                @foreach (var status in _statuses)
+                @if (_statuses != null && _statuses.Any())
                 {
-                    <MudSelectItem @key="status.Id" Value="@status.Id" Label="@status.Name" />
+                    @foreach (var status in _statuses)
+                    {
+                        <MudSelectItem T="ProductStatuses" @key="status" Value="@status" Label="@status.Name" />
+                    }
+                }
+                else
+                {
+                    <MudSelectItem T="ProductStatuses" Value="null" Label="Нет статусов" Disabled="true" />
                 }
             </MudSelect>
         </MudTd>
@@ -42,28 +56,37 @@
     void Cancel() => MudDialog.Cancel();
 
     protected override async Task OnInitializedAsync()
-    {        
-        await base.OnInitializedAsync();
+    {
         _statuses = await WarehouseApiClient.GetProductStatusesAsync();
         _groups = await WarehouseApiClient.GetProductGroupAsync();
-        
+
+        if (_groups != null && _groups.Any())
+        {
+            _newProductGroup = _groups.First();
+        }
+
+        if (_statuses != null && _statuses.Any())
+        {
+            _newProductStatuses = _statuses.First();
+        }
+
+        await base.OnInitializedAsync();
     }
+
     private async Task Add()
     {
         Products newItem = new()
             {
                 Name = _newName,
-                Code= _newCode,
-                BoxSize= 1,
+                Code = _newCode,
+                BoxSize = 1,
                 ProductGroupId = _newProductGroup.Id,
                 ProductStatusId = _newProductStatuses.Id,
-                MinimumStock = _newMinStock,
-                ProductGroup = _newProductGroup,
-                ProductStatuses = _newProductStatuses
-
+                MinimumStock = _newMinStock
             };
+
         await WarehouseApiClient.AddProductsAsync(newItem);
-       // _product = await WarehouseApiClient.GetProductsAsync();
-        MudDialog.Close(DialogResult.Ok(true));
+             MudDialog.Close(DialogResult.Ok(true));
+
     }
 }

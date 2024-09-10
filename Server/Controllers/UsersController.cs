@@ -7,6 +7,7 @@ using Server.Repositories;
 using Server.Repositories.Interfaces;
 using Server.Service;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Server.Controllers
 {
@@ -46,7 +47,6 @@ namespace Server.Controllers
                 {
                     return Unauthorized("Неверные учетные данные");
                 }
-
                 return Ok(token);
             }
             catch (Exception ex)
@@ -54,6 +54,28 @@ namespace Server.Controllers
                 return StatusCode(500, $"Ошибка при входе пользователя: {ex.Message}");
             }
         }
+
+        [HttpPost("loginMobil")]
+        public async Task<IActionResult> LoginMobil(
+            [FromBody] LoginUserRequest request)
+        {
+            Console.WriteLine($"Request: {request}");
+            try
+            {
+                var JWTtoken = await _userService.Login(request.Login, request.Password);
+                if (string.IsNullOrEmpty(JWTtoken))
+                {
+                    return Unauthorized("Неверные учетные данные");
+                }
+                var token = new { token = "T8ffjOJCu5LWqDPmK4m5apECnCCNOGfH" };
+                return new JsonResult(token);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ошибка при входе пользователя: {ex.Message}");
+            }
+        }
+
 
         [HttpGet("get_all")]
         public async Task<IEnumerable<Users>> GetUsers(CancellationToken cancellationToken)

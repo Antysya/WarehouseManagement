@@ -1,4 +1,5 @@
 ﻿using DataModel;
+using DataModel.Contract;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Server.Repositories.Interfaces;
@@ -25,6 +26,12 @@ namespace Server.Controllers
         public async Task<ProductsInOrders> GetProductInOrdersById(int id, CancellationToken cancellationToken)
         {
             return await _repository.GetById(id, cancellationToken);
+        }
+
+        [HttpGet("getProductsByOrder")]
+        public async Task<IEnumerable<ProductsInOrderResponse>> GetProductsByOrderId(int id, CancellationToken cancellationToken)
+        {
+            return await _repository.GetProductsByOrderId(id, cancellationToken);
         }
 
         [HttpPost("add")]

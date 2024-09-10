@@ -23,8 +23,8 @@ else
             <col style="width:50px;" />
             <col />
             <col />
-            <col style="width:50px;" />
-            <col style="width:50px;"/>
+            <col style="width:100px;" />
+            <col style="width:100px;"/>
             <col style="width:50px;" />
             <col />
         </ColGroup>
@@ -95,6 +95,7 @@ else
     {
         products = await WarehouseApiClient.GetProductsAsync();
         groups = await WarehouseApiClient.GetProductGroupAsync();
+        statuses = await WarehouseApiClient.GetProductStatusesAsync();
         await base.OnInitializedAsync();
     }
 
@@ -156,6 +157,7 @@ else
             {
                 CloseOnEscapeKey = true
             };
+
 
         DialogService.Show<AddProduct>
             ("Добавить новый товар", closeOnEscapeKey);
