@@ -16,7 +16,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddSingleton(sp => new HttpClient() { });
 builder.Services.AddSingleton(provider
-    => new WarehouseApiClient(provider.GetRequiredService<HttpClient>(), "https://192.168.1.70:7181"));
+    => new WarehouseApiClient(provider.GetRequiredService<HttpClient>(), "https://192.168.43.6:7181" /*"https://192.168.1.70:7181"*/));
 builder.Services.AddMudServices();
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<IdentityAuthenticationStateProvider>();

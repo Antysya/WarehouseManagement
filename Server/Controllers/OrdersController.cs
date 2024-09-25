@@ -31,13 +31,8 @@ namespace Server.Controllers
         }
 
         [HttpPost("status/{id}")]
-        public async Task<IActionResult> ChangeOrderStatus(int id, [FromHeader] string token, CancellationToken cancellationToken)
+        public async Task<IActionResult> ChangeOrderStatus(int id, CancellationToken cancellationToken)
         {
-            if (!await ValidateToken(token))
-            {
-                return Unauthorized("Недействительный токен");
-            }
-
             var orderToUpdate = await _repository.GetById(id);
             if (orderToUpdate == null)
             {
@@ -47,11 +42,6 @@ namespace Server.Controllers
             orderToUpdate.OrderStatusId = newStatusId;
             await _repository.Update(orderToUpdate, cancellationToken);
             return Ok();
-        }
-        private async Task<bool> ValidateToken(string token)
-        {
-            // Реализация проверки токена
-            return true;
         }
 
         [HttpGet("get")]
